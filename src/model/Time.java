@@ -8,4 +8,9 @@ public class Time {
         this.hours = hours;
         this.minutes = minutes;
     }
+
+
+    public void addTime(Time estimatedTime) {
+        //TODO logic that adds TIME + TIME = TIME
+    }
 }

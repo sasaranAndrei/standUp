@@ -15,11 +15,11 @@ package model;
     100         - nivel 4 - Done
  */
 public class Progress {
-    private static float PROGRESS_LIMITS[] = {0.2f, 0.4f, 0.7f, 1}; // folosit pt a determina niveleul
-    private static int PROGRESS_LEVEL[] = {0, 1, 2, 3, 4}; // folosit la afisari
-    private static String PROGRESS_LABEL[] = {"Just Started", "Something Done", "Working", "Almost Done", "Done"};// folosit la afisari
-    private static int FIRST_LEVEL  = 0;
-    private static int LAST_LEVEL   = 4;
+    private static final float PROGRESS_LIMITS[] = {0.2f, 0.4f, 0.7f, 1}; // folosit pt a determina niveleul
+    private static final int PROGRESS_LEVEL[] = {0, 1, 2, 3, 4}; // folosit la afisari
+    private static final String PROGRESS_LABEL[] = {"Just Started", "Something Done", "Working", "Almost Done", "Done"};// folosit la afisari
+    private static final int FIRST_LEVEL  = 0;
+    public static final int LAST_LEVEL   = 4;
 
     private float value; // procent [0,1]
     private int level; // [1..5]
@@ -45,7 +45,6 @@ public class Progress {
 
         // actualizam si label-ul
         label = PROGRESS_LABEL[level];
-        System.out.println(this);
     }
 
     // functie care stabileste nivelul, in functie de procentul introdus de utilizator
@@ -54,6 +53,14 @@ public class Progress {
             if (value < PROGRESS_LIMITS[level]) return level;
         }
         return LAST_LEVEL;
+    }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public float getValue() {
+        return value;
     }
 
     @Override
