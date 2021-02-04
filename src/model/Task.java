@@ -65,4 +65,9 @@ public class Task extends AbstractGoal{
         return "Task about " + description.getDescription() + "\n/./ estimatedWorkTime : " + estimatedTime
                 + " /./ realizedWorkTime : " + realizedTime + " /./ progress " + progress + "\n";
     }
+
+    public String getTaskDescription() {
+        ///TODO : primele 20 de caracatere din description sa apara.
+        return "12345678901234567890";
+    }
 }

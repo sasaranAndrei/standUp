@@ -15,9 +15,10 @@ import java.util.Date;
 public class StandUpView {
     /// frame & panels constants
     private static Dimension MAIN_PANEL_DIMENSION = new Dimension(400, 40);
-    private static Dimension DESCRIPTION_PANEL_DIMENSION = new Dimension(400, 40);
     private static Dimension TASK_PANEL_DIMENSION = new Dimension(400, 40);
     private static Dimension FRAME_DIMENSION = new Dimension(400, 130); // height = 130 up to 200
+    private static int FRAME_INCREASE_DIMENSION = 27;
+    private static Dimension WORK_BUTTON_SIZE = new Dimension(79, 24); // height = 130 up to 200
 
     private static final int RIGHT_BOTTOM_CORNER_Y = 200;
     private static final int COMPONENT_TEXT_SIZE = 12;
@@ -77,7 +78,6 @@ public class StandUpView {
 
     public void test (){
         System.out.println("testing VIEW");
-
     }
 
     // JPanel for the main (header part of the app)
@@ -175,13 +175,15 @@ public class StandUpView {
         }
 
         private JPanel createDescriptionPanel (){
-            JPanel descriptionPanel = new JPanel(new FlowLayout());
+            ///TODO set colors and stuff
+            JPanel descriptionPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
             /// active tasks label
-            activeTasksLabel = new JLabel("ACTIVE TASKS");
+            activeTasksLabel = new JLabel("TASKS");
             activeTasksLabel.setFont(new Font("Bodoni MT Black", Font.BOLD, COMPONENT_TEXT_SIZE));
             activeTasksLabel.setForeground(LABEL_COLOR);
             descriptionPanel.add(activeTasksLabel);
 
+            descriptionPanel.add(new JLabel("  "));
             /// add task button
             addTaskButton = new JButton("ADD TASK");
             addTaskButton.setFont(new Font("Bodoni MT Black", Font.BOLD, COMPONENT_TEXT_SIZE));
@@ -191,12 +193,14 @@ public class StandUpView {
             addTaskButton.addActionListener(e -> addTaskLinePanel()); // !!!!!!!!
             descriptionPanel.add(addTaskButton);
 
+            descriptionPanel.add(new JLabel("   "));
             /// workLabel
             workLabel = new JLabel("WORK");
             workLabel.setFont(new Font("Bodoni MT Black", Font.BOLD, COMPONENT_TEXT_SIZE));
             workLabel.setForeground(LABEL_COLOR);
             descriptionPanel.add(workLabel);
 
+            descriptionPanel.add(new JLabel("   "));
             /// timeLabel
             timeLabel = new JLabel("TIME");
             timeLabel.setFont(new Font("Bodoni MT Black", Font.BOLD, COMPONENT_TEXT_SIZE));
@@ -213,7 +217,8 @@ public class StandUpView {
         }
 
         private JPanel createTaskRowsPanel (){
-            JPanel taskRowsPanel = new JPanel(new GridBagLayout());
+            ///TODO set colors and stuff
+            JPanel taskRowsPanel = new JPanel(new GridLayout(0, 1));
             return taskRowsPanel;
         }
 
@@ -230,21 +235,14 @@ public class StandUpView {
             // view
             resizeWindow();
 
-            /*
             TaskLinePanel taskLinePanel = new TaskLinePanel();
             tasks.add(taskLinePanel.task); // model
-            this.add(taskLinePanel);
+            taskRowsPanel.add(taskLinePanel);
             validate();
-
-
-             */
-
-
-
         }
 
         private void resizeWindow (){
-            FRAME_DIMENSION = new Dimension(FRAME_DIMENSION.width, FRAME_DIMENSION.height + 25);
+            FRAME_DIMENSION = new Dimension(FRAME_DIMENSION.width, FRAME_DIMENSION.height + FRAME_INCREASE_DIMENSION);
             frame.setSize(FRAME_DIMENSION);
             frame.validate();
 
@@ -264,14 +262,15 @@ public class StandUpView {
         private JButton taskWorkButton;
         private JLabel taskTime;
         private JTextField taskProgress;
+        private JButton saveProgressButton;
 
         public TaskLinePanel (){
+            // model
             task = new Task(testGoal, testDescription, testEstimatedTime);
             currentWorkTime = new Time(0,0);
-            //this.setSize(DESCRIPTION_PANEL_DIMENSION);
-            // layout & components
-            //this.setLayout(new GridLayout(0,3,1,1));
-            this.setLayout(new FlowLayout());
+
+            // view
+            this.setLayout(new FlowLayout(FlowLayout.LEFT));
             initComponents();
 
             this.setBackground(MAIN_PANEL_COLOR);
@@ -285,7 +284,8 @@ public class StandUpView {
         }
 
         private void initComponents (){
-            taskDescriptionLabel = new JLabel(task.getDescription().getDescription());
+            ///TODO : put 'spaces' between elements of panel, for keeping an alignment
+            taskDescriptionLabel = new JLabel(task.getTaskDescription(), SwingConstants.LEFT);
             taskDescriptionLabel.setFont(new Font("Bodoni MT Black", Font.BOLD, COMPONENT_TEXT_SIZE));
             taskDescriptionLabel.setForeground(LABEL_COLOR);
             this.add(taskDescriptionLabel);
@@ -295,6 +295,7 @@ public class StandUpView {
             taskWorkButton.setForeground(BUTTON_COLOR);
             taskWorkButton.setOpaque(true);
             taskWorkButton.setBackground(BUTTON_BACKGROUND_COLOR);
+            taskWorkButton.setPreferredSize(WORK_BUTTON_SIZE);
             this.add(taskWorkButton);
 
             taskTime = new JLabel(currentWorkTime.toString());
@@ -305,6 +306,24 @@ public class StandUpView {
             taskProgress = new JTextField(3);
             taskProgress.setText(task.getProcentValue() + "%");
             this.add(taskProgress);
+
+
+            ImageIcon saveIcon = new ImageIcon("resources/saveIcon.png");
+            Image image = saveIcon.getImage();
+            Image resizedImage = image.getScaledInstance(10, 10, Image.SCALE_SMOOTH);
+            saveIcon = new ImageIcon(resizedImage);
+            saveProgressButton = new JButton(saveIcon);
+            saveProgressButton.setFont(new Font("Bodoni MT Black", Font.BOLD, COMPONENT_TEXT_SIZE));
+            saveProgressButton.setForeground(BUTTON_COLOR);
+            saveProgressButton.setOpaque(true);
+
+//            saveProgressButton.setSize(100,100);
+            saveProgressButton.setBackground(BUTTON_BACKGROUND_COLOR);
+
+
+
+//            saveProgressButton.setIcon();
+            this.add(saveProgressButton);
         }
     }
 
