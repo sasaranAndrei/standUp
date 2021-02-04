@@ -10,4 +10,12 @@ public class Description {
         this.description = description;
         this.estimatedDate = estimatedDate;
     }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public Date getEstimatedDate() {
+        return estimatedDate;
+    }
 }

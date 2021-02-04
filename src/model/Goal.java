@@ -30,8 +30,8 @@ public class Goal extends AbstractGoal{
     public void addTask (Task newTask){
         tasks.add(newTask); // adaugam taskul la lista goalului
         // si actualizam timpii
-        //estimatedTime.addTime(newTask.getEstimatedTime());
-        //realizedTime.addTime(newTask.getRealizedTime());
+        estimatedTime.addTime(newTask.getEstimatedTime());
+        realizedTime.addTime(newTask.getRealizedTime());
         // progresul nu l actualizam pt ca la adaugarea unui task nou inseamna ca acesta are progres = 0.
     }
 
@@ -39,8 +39,6 @@ public class Goal extends AbstractGoal{
     public int numberOfTasks (){
         return tasks.size();
     }
-
-
 
     /// GETTERS - override methods from AbstractGoal
     @Override
@@ -75,8 +73,13 @@ public class Goal extends AbstractGoal{
         float sumOfProgressValues = 0.0f;
         for (Task task : tasks) sumOfProgressValues += task.getProgressValue();
 
-        System.out.println(sumOfProgressValues +  " / " + numberOfTasks());
         return sumOfProgressValues / numberOfTasks();
     }
 
+    @Override
+    public String toString() {
+        return "Goal about : " + description.getDescription() + " /./ estimated date : " + description.getEstimatedDate()
+                + "\n/./ estimatedWorkTime : " + estimatedTime + " /./ realizedWorkTime : "  + realizedTime
+                + "\n/./ the list of task : \n" + tasks;
+    }
 }

@@ -54,4 +54,15 @@ public class Task extends AbstractGoal{
         goal.updateProgress();
     }
     // probabil o sa trebuiasca sa fac la fel si pt realizedTime
+
+    public int getProcentValue (){
+        int procentValue = (int) getProgressValue() * 100;
+        return procentValue;
+    }
+
+    @Override
+    public String toString() {
+        return "Task about " + description.getDescription() + "\n/./ estimatedWorkTime : " + estimatedTime
+                + " /./ realizedWorkTime : " + realizedTime + " /./ progress " + progress + "\n";
+    }
 }
