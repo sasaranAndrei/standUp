@@ -20,7 +20,7 @@ public class ViewUtils {
     static final Dimension TASK_PANEL_DIMENSION = new Dimension(400, 40);
     static Dimension FRAME_DIMENSION = new Dimension(400, 130); // CAN BE MODIFIED -> not FINAL // height = 130 up to 200
     static final int FRAME_INCREASE_DIMENSION = 27;
-    static final Dimension WORK_BUTTON_SIZE = new Dimension(79, 24); // height = 130 up to 200
+    public static final Dimension WORK_BUTTON_SIZE = new Dimension(79, 24); // height = 130 up to 200
 
 
     public static void setFrameLocationBottomRightCorner(JFrame frame) {
