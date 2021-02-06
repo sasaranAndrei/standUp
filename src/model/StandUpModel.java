@@ -1,9 +1,21 @@
 package model;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Timer;
 
 public class StandUpModel {
+    /// CONSTATS
+    private static final String DB_LOCATION = "tasks.xlsx";
+
+    /// fields
+    private ArrayList<Goal> allGoals;
+
+    private ArrayList<Task> currentTasks; // tasks that will be modified in View, and will get modified from Controller
+    private ArrayList<Goal> newGoals; // goals  created from the View
+    private ArrayList<Task> deleteTasks; // tasks that must be deleted (View)
+
+    ///TODO met : storeData, loadData,
 
     public void test (){
         //Timer timer = new Timer();
