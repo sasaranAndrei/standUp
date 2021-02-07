@@ -47,7 +47,6 @@ public class StandUpView {
         frame.validate();
     }
 
-
     // JPanel for the main (header part of the app)
     private class MainPanel extends JPanel {
         private JButton manageGoalsButton;
@@ -59,13 +58,13 @@ public class StandUpView {
             this.setSize(ViewUtils.MAIN_PANEL_DIMENSION);
             // layout & components
             this.setLayout(new FlowLayout());
-            createComponents();
+            initComponents();
 
             this.setBackground(ViewUtils.MAIN_PANEL_COLOR);
             this.validate();
         }
 
-        void createComponents (){
+        void initComponents(){
             manageGoalsButton = new JButton("MANAGE GOALS");
             manageGoalsButton.setFont(new Font("Bodoni MT Black", Font.BOLD, ViewUtils.COMPONENT_TEXT_SIZE));
             manageGoalsButton.setForeground(ViewUtils.BUTTON_COLOR);
@@ -75,17 +74,14 @@ public class StandUpView {
             manageGoalsButton.addActionListener(new ManageGoalListener());
             this.add(manageGoalsButton);
 
-
             globalTimeLabel = new JLabel("TOTAL WORK TIME : ");
             globalTimeLabel.setFont(new Font("Bodoni MT Black", Font.BOLD, ViewUtils.COMPONENT_TEXT_SIZE));
             globalTimeLabel.setForeground(ViewUtils.LABEL_COLOR);
             this.add(globalTimeLabel);
-            //this.add(globalTimeLabel, 0, 1);
 
             globalTimeValueLabel = new JLabel("00:00");
             globalTimeValueLabel.setFont(new Font("Bodoni MT Black", Font.BOLD, ViewUtils.COMPONENT_TEXT_SIZE));
             globalTimeValueLabel.setForeground(ViewUtils.LABEL_COLOR);
-            //this.add(globalTimeValueLabel, 0, 2);
             this.add(globalTimeValueLabel);
 
             validate();
@@ -113,9 +109,6 @@ public class StandUpView {
         private JLabel workLabel;
         private JLabel timeLabel;
         private JLabel progressLabel;
-
-//        GridBagConstraints constraints;
-//        Insets insets;
 
         public TasksPanel() {
             // model

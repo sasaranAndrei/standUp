@@ -50,7 +50,7 @@ public class StandUpController {
     }
 
     /// listeners for Goal Manager Frame
-    public class AddGoalListener implements ActionListener {
+    public static class AddGoalListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -58,7 +58,7 @@ public class StandUpController {
         }
     }
 
-    public class EditGoalListener implements ActionListener {
+    public static class EditGoalListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -66,5 +66,12 @@ public class StandUpController {
         }
     }
 
+    public static class SelectGoalListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            //todo
+
+        }
+    }
 
 }
