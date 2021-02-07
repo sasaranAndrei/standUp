@@ -19,15 +19,16 @@ public class StandUpView {
     // frame & panels
     private JFrame frame;
     private MainPanel mainPanel;
-    private TasksPanel descriptionPanel;
     private TasksPanel tasksPanel;
 
     public StandUpView() {
         frame = new JFrame(); // viewFrame
         frame.setTitle("StandApp");
+
         // save and close operations
-        frame.addWindowListener(new MyWindowListener(frame));
+        frame.addWindowListener(new MyWindowListener());
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // EXIT!!!!!
+
         // size & location of frame
         frame.setSize(ViewUtils.FRAME_DIMENSION);
         ViewUtils.setFrameLocationBottomRightCorner(frame);
@@ -37,16 +38,14 @@ public class StandUpView {
         // frame layout & panels
         frame.setLayout(new BorderLayout());
         mainPanel = new MainPanel();
-        //descriptionPanel = new TasksPanel();
         tasksPanel = new TasksPanel();
+
+        // add components
         frame.add(mainPanel, BorderLayout.NORTH);
         frame.add(tasksPanel, BorderLayout.CENTER);
-        //frame.add(tasksPanel, BorderLayout.SOUTH);
 
-        //frame.pack();
         frame.validate();
     }
-
 
 
     // JPanel for the main (header part of the app)
@@ -59,9 +58,7 @@ public class StandUpView {
             // size
             this.setSize(ViewUtils.MAIN_PANEL_DIMENSION);
             // layout & components
-            //this.setLayout(new GridLayout(0,3,1,1));
             this.setLayout(new FlowLayout());
-            //this.setLayout(new BorderLayout());
             createComponents();
 
             this.setBackground(ViewUtils.MAIN_PANEL_COLOR);
@@ -99,7 +96,7 @@ public class StandUpView {
         @Override
         public void actionPerformed(ActionEvent e) {
             ManageGoalsFrame manageGoalsFrame = new ManageGoalsFrame(frame);
-            //frame.setVisible(true);
+            ViewUtils.switchFrame(frame, manageGoalsFrame.getFrame());
         }
     }
 
@@ -289,5 +286,48 @@ public class StandUpView {
         }
     }
 
+    // WindowsListener for saving the data before closing app.
+    class MyWindowListener implements WindowListener {
+
+        @Override
+        public void windowOpened(WindowEvent e) {
+
+        }
+
+        @Override
+        public void windowClosing(WindowEvent e) {
+            //TODO SAVE THE WORK BEFORE CLOSING APP
+            System.out.println("X button => QUIT");
+            System.out.println("save the work PLS");
+            frame.dispose();
+        }
+
+        @Override
+        public void windowClosed(WindowEvent e) {
+
+        }
+
+        @Override
+        public void windowIconified(WindowEvent e) {
+
+        }
+
+        @Override
+        public void windowDeiconified(WindowEvent e) {
+
+        }
+
+        @Override
+        public void windowActivated(WindowEvent e) {
+
+        }
+
+        @Override
+        public void windowDeactivated(WindowEvent e) {
+
+        }
+    }
 
 }
+
+
