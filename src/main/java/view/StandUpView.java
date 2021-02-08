@@ -1,5 +1,8 @@
 package view;
 
+//todo add manually all the listeners from controller
+import controller.StandUpController.ManageGoalListener;
+
 import model.Description;
 import model.Goal;
 import model.Task;
@@ -15,16 +18,20 @@ import java.util.ArrayList;
 import java.util.Date;
 
 public class StandUpView {
+    // child frame
+    public ManageGoalsFrame manageGoalsFrame;
 
     // frame & panels
     private JFrame frame;
-    //private JFrame manageGoalsFrame;
     private MainPanel mainPanel;
     private TasksPanel tasksPanel;
 
     public StandUpView() {
-        frame = new JFrame(); // viewFrame
+        // frames stuff
+        frame = new JFrame();
         frame.setTitle("StandApp");
+        manageGoalsFrame = new ManageGoalsFrame(frame); // la inceput le pornim pe ambele
+        ViewUtils.switchFrame(manageGoalsFrame.getFrame(), frame);  // iar butonul de manage goals doar le comuta.
 
         // save and close operations
         frame.addWindowListener(new MyWindowListener());
@@ -48,6 +55,11 @@ public class StandUpView {
         frame.validate();
     }
 
+    public void addManageGoalsListener(ManageGoalListener manageGoalListener) {
+        // Manage Goals BUTTON
+        mainPanel.manageGoalsButton.addActionListener(manageGoalListener);
+    }
+
     // JPanel for the main (header part of the app)
     private class MainPanel extends JPanel {
         private JButton manageGoalsButton;
@@ -55,7 +67,6 @@ public class StandUpView {
         private JLabel globalTimeValueLabel;
 
         public MainPanel() {
-            //manageGoalsFrame = new ManageGoalsFrame(frame).getFrame();
             // size
             this.setSize(ViewUtils.MAIN_PANEL_DIMENSION);
             // layout & components
@@ -72,8 +83,6 @@ public class StandUpView {
             manageGoalsButton.setForeground(ViewUtils.BUTTON_COLOR);
             manageGoalsButton.setOpaque(true);
             manageGoalsButton.setBackground(ViewUtils.BUTTON_BACKGROUND_COLOR);
-            //// ACTION LISTENER
-            manageGoalsButton.addActionListener(new ManageGoalListener());
             this.add(manageGoalsButton);
 
             globalTimeLabel = new JLabel("TOTAL WORK TIME : ");
@@ -90,13 +99,7 @@ public class StandUpView {
         }
     }
 
-    private class ManageGoalListener implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            ManageGoalsFrame manageGoalsFrame = new ManageGoalsFrame(frame);
-            ViewUtils.switchFrame(frame, manageGoalsFrame.getFrame());
-        }
-    }
+
 
     private class TasksPanel extends JPanel{
         // model
@@ -322,6 +325,15 @@ public class StandUpView {
 
         }
     }
+
+    public JFrame getFrame() {
+        return frame;
+    }
+
+    public JFrame getChildFrame() {
+        return manageGoalsFrame.getFrame();
+    }
+
 
 }
 

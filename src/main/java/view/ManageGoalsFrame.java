@@ -6,10 +6,17 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.util.Date;
 
 import com.toedter.calendar.JCalendar;
 import com.toedter.calendar.JDateChooser;
 import controller.*;
+
+//todo add manually all the listeners from controller
+import controller.StandUpController.AddGoalListener;
+import controller.StandUpController.EditGoalListener;
+import controller.StandUpController.SelectGoalListener;
+
 
 public class ManageGoalsFrame {
 
@@ -51,6 +58,30 @@ public class ManageGoalsFrame {
 
         frame.validate();
     }
+
+    private AddGoalListener addGoalListener;
+
+    //TODO poate i schimb numele in INIT addGoalListeenr...
+    public void addAddGoalListener (AddGoalListener addGoalListener){
+        // il salvez aici pentru ca addGoal apare doar daca suntem in modul AddGoal din display panel
+        this.addGoalListener = addGoalListener;
+    }
+
+    ///////////////////
+    // data from components from this view (used in controller)
+    private Date selectedDate;
+    private String descriptionString;
+    // and their getters
+    public Date getSelectedDate() {
+        return selectedDate;
+    }
+    public String getDescriptionString() {
+        return descriptionString;
+    }
+    //////////////////
+
+
+
 
     private class MainPanel extends JPanel {
         private JButton addGoalButton;
@@ -138,11 +169,12 @@ public class ManageGoalsFrame {
 
             //estimatedDatePanel.add(new JLabel("aici o sa bag calendaru"));
             addGoalButton = new JButton("FINISH");
+            addGoalButton.addActionListener(addGoalListener);
             addGoalButton.addActionListener(e -> {
-                System.out.println(calendar.getDate().toString());
-                System.out.println(calendar.getDateFormatString());
+                descriptionString = enterDescription.getText();
+                selectedDate = calendar.getDate();
             });
-            addGoalButton.addActionListener(new StandUpController.AddGoalListener()); //todo -> add to the db.
+
             estimatedDatePanel.add(addGoalButton);
 
 

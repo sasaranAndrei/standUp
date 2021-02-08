@@ -1,11 +1,15 @@
 package controller;
 
+import model.Description;
+import model.Goal;
 import model.StandUpModel;
 import view.StandUpView;
+import view.ViewUtils;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Date;
 
 public class StandUpController {
 
@@ -15,7 +19,11 @@ public class StandUpController {
     public StandUpController(StandUpModel model, StandUpView view) {
         this.model = model;
         this.view = view;
-        //this.view.
+
+        //todo a method for adding all the listeners...
+        //todo methods view.addXListener => in View avem view.component.addActionListener(XListener)
+        this.view.addManageGoalsListener(new ManageGoalListener());
+        this.view.manageGoalsFrame.addAddGoalListener(new AddGoalListener());
     }
 
     public static void main(String[] args) {
@@ -24,6 +32,14 @@ public class StandUpController {
         StandUpController controller = new StandUpController(model, view);
 
         model.loadData();
+    }
+
+    /// listener for ManageGoals Button
+    public class ManageGoalListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            ViewUtils.switchFrame(view.getFrame(), view.getChildFrame());
+        }
     }
 
     /// listeners for MainFrame
@@ -52,11 +68,23 @@ public class StandUpController {
     }
 
     /// listeners for Goal Manager Frame
-    public static class AddGoalListener implements ActionListener {
+    public  class AddGoalListener implements ActionListener {
 
         @Override
-        public void actionPerformed(ActionEvent e) {
-            //TODO
+        public void actionPerformed(ActionEvent e) { // it kinda works!
+            System.out.println("Add the goal");
+            //MOMENTAN PREUSPUNEM CA DATELES VALIDE
+            Date date = view.manageGoalsFrame.getSelectedDate();
+            String descriptionString = view.manageGoalsFrame.getDescriptionString();
+            Description description = new Description(descriptionString, date);
+
+            Goal goal = new Goal(description);
+            System.out.println("goal that we established " + goal);
+
+            //System.out.println(date);
+            //TODO PROCESS DATE. maybe I'll do a ParserClass for all the parsing stuff in the project.
+//
+  //          System.out.println(calendar.getDateFormatString());
         }
     }
 
