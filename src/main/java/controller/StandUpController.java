@@ -7,7 +7,6 @@ import model.StandUpModel;
 import view.StandUpView;
 import view.ViewUtils;
 
-import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Date;
@@ -22,19 +21,20 @@ public class StandUpController {
         this.view = view;
 
         /// init data in the model
-        //this.model.loadData();
+        this.model.loadData();
 
         //todo a method for adding all the listeners...
         //todo methods view.addXListener => in View avem view.component.addActionListener(XListener)
         this.view.addManageGoalsListener(new ManageGoalListener());
-        this.view.manageGoalsFrame.addAddGoalListener(new AddGoalListener());
+        this.view.manageGoalsFrame.initAddGoalListener(new AddGoalListener());
+        this.view.manageGoalsFrame.initEditGoalListener(new EditGoalListener(), model.getGoals());
+
     }
 
     public static void main(String[] args) {
         StandUpModel model  = new StandUpModel();
         StandUpView  view   = new StandUpView();
         StandUpController controller = new StandUpController(model, view);
-
 
     }
 
@@ -96,7 +96,7 @@ public class StandUpController {
         }
     }
 
-    public static class EditGoalListener implements ActionListener {
+    public class EditGoalListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {

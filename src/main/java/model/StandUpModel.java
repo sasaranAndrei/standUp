@@ -42,4 +42,8 @@ public class StandUpModel {
 
 
     }
+
+    public ArrayList<Goal> getGoals() {
+        return allGoals;
+    }
 }

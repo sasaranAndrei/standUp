@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.util.ArrayList;
 import java.util.Date;
 
 import com.toedter.calendar.JCalendar;
@@ -16,6 +17,7 @@ import controller.*;
 import controller.StandUpController.AddGoalListener;
 import controller.StandUpController.EditGoalListener;
 import controller.StandUpController.SelectGoalListener;
+import model.Goal;
 
 
 public class ManageGoalsFrame {
@@ -26,6 +28,9 @@ public class ManageGoalsFrame {
 
     private MainPanel mainPanel;
     private JPanel displayPanel;
+
+    private AddGoalPanel addGoalPanel;
+    private EditGoalPanel editGoalPanel;
 
     public JFrame getFrame() {
         return frame;
@@ -52,6 +57,10 @@ public class ManageGoalsFrame {
         mainPanel = new MainPanel();
         //displayPanel = new DisplayPanel();
 
+        // le initiem dar nu le aduagam
+        addGoalPanel = new AddGoalPanel();
+        editGoalPanel = new EditGoalPanel();
+
         // add components
         frame.add(mainPanel, BorderLayout.NORTH);
         //frame.add(displayPanel, BorderLayout.CENTER);
@@ -59,16 +68,35 @@ public class ManageGoalsFrame {
         frame.validate();
     }
 
+    //****************************** LISTENERS **************************************
+    /// listeners that will be established later... on other click events.
+    /// for now, we just save them
     private AddGoalListener addGoalListener;
+    private EditGoalListener editGoalListener;
 
     //TODO poate i schimb numele in INIT addGoalListeenr...
-    public void addAddGoalListener (AddGoalListener addGoalListener){
+    public void initAddGoalListener(AddGoalListener addGoalListener){
         // il salvez aici pentru ca addGoal apare doar daca suntem in modul AddGoal din display panel
         this.addGoalListener = addGoalListener;
     }
 
-    ///////////////////
-    // data from components from this view (used in controller)
+    public void initEditGoalListener(EditGoalListener editGoalListener, ArrayList<Goal> goals) {
+        this.editGoalListener = editGoalListener;
+        for (Goal goal : goals){
+            goalsString.add(goal.getShortDescription());
+        }
+    }
+    //****************************** LISTENERS **************************************
+
+
+    //[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[ data from Controller]]]]]]]]]]]]]]]]]]]]]]]]]]]]
+
+    //private ArrayList<Goal> goals;
+    private ArrayList<String> goalsString = new ArrayList<>();
+    //[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[ data from Controller]]]]]]]]]]]]]]]]]]]]]]]]]]]]
+
+
+    //{{{{{{{{{{{{{data from components from this view (used in controller)}}}}}}}}}}}}
     private Date selectedDate;
     private String descriptionString;
     // and their getters
@@ -78,7 +106,8 @@ public class ManageGoalsFrame {
     public String getDescriptionString() {
         return descriptionString;
     }
-    //////////////////
+
+    //{{{{{{{{{{{{{data from components from this view (used in controller)}}}}}}}}}}}}
 
 
 
@@ -105,8 +134,13 @@ public class ManageGoalsFrame {
             addGoalButton.setBackground(ViewUtils.BUTTON_BACKGROUND_COLOR);
             //// ACTION LISTENER
             addGoalButton.addActionListener(e -> {
-                displayPanel = new AddGoalPanel();
+                // comutare de la AddGoal ->  EditGoal
+                if (displayPanel != null) frame.remove(displayPanel);
+                displayPanel = new AddGoalPanel(); // / addGoalPanel
                 frame.add(displayPanel, BorderLayout.CENTER);
+                frame.revalidate();
+                frame.repaint();
+
             }); // displayPanel = ADD GOAL BUTTON
             this.add(addGoalButton);
 
@@ -118,10 +152,13 @@ public class ManageGoalsFrame {
             editGoalButton.setOpaque(true);
             editGoalButton.setBackground(ViewUtils.BUTTON_BACKGROUND_COLOR);
             //// ACTION LISTENER
-            editGoalButton.addActionListener(new StandUpController.EditGoalListener());
             editGoalButton.addActionListener(e -> {
-                displayPanel = new EditGoalPanel();
-                frame.add(displayPanel);
+                // comutare de la AddGoal ->  EditGoal
+                if (displayPanel != null) frame.remove(displayPanel);
+                displayPanel = new EditGoalPanel();// / editGoalPanel
+                frame.add(displayPanel, BorderLayout.CENTER);
+                frame.revalidate();
+                frame.repaint();
             });
             this.add(editGoalButton);
         }
@@ -138,6 +175,7 @@ public class ManageGoalsFrame {
         //todo => use colors on the compoentns
 
         public AddGoalPanel() {
+            this.removeAll();
             // size & layout
             this.setSize(ViewUtils.MAIN_PANEL_DIMENSION);
             this.setLayout(new BorderLayout());
@@ -171,6 +209,7 @@ public class ManageGoalsFrame {
             addGoalButton = new JButton("FINISH");
             addGoalButton.addActionListener(addGoalListener);
             addGoalButton.addActionListener(e -> {
+                ///// set the data used in controller.
                 descriptionString = enterDescription.getText();
                 selectedDate = calendar.getDate();
             });
@@ -190,28 +229,33 @@ public class ManageGoalsFrame {
         private JButton addTask;
         private JButton deleteTask;
 
-        private JPanel displayPanel;
+        private JPanel displayPanelEdit;
 
         public EditGoalPanel() {
             // size & layout
             this.setSize(ViewUtils.MAIN_PANEL_DIMENSION);
             this.setLayout(new BorderLayout());
+
+            this.add(new JLabel("PLM"));
+
             // components
-            initComponents();
-            frame.repaint();
+            //initComponents();
+            //frame.repaint();
             frame.validate();
 
         }
 
         private void initComponents() {
-            this.add(createSelectPanel());
+           this.add(createSelectPanel());
 
         }
 
         private JPanel createSelectPanel (){
+            System.out.println("here in create select panel");
             JPanel selectPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
             selectGoal = new JComboBox<>();
+            selectGoal.setModel(new DefaultComboBoxModel<>(goalsString.toArray(new String[0])));
             selectGoal.addActionListener(new StandUpController.SelectGoalListener());
 
             return selectPanel;

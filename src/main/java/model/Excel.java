@@ -1,5 +1,6 @@
 package model;
 
+
 import org.apache.poi.ss.usermodel.*;
 
 import javax.swing.*;
@@ -54,22 +55,22 @@ public class Excel {
             Row currentRow = sheet.getRow(row);
             if (emptyRow(currentRow)) { // EMPTY ROW = e un rand de pauza intre goaluri
                 //todo: saveGoalWithHisTask & reinitCurrentGoalAndHisTask
-                System.out.println("empty row -> save");
+                System.out.println("TAG -> empty row -> save");
 
             }
 
             else { // ABSTRACT GOAL ROW = e un rand in care sunt info legate de Goal / Task
                 //todo: if (goal) currentGoal = goal, else currentTasks += task
                 Cell tag = currentRow.getCell(TAG); // read row Tag
-                System.out.println(tag);
+                System.out.println("TAG -> " + tag);
 
                 if (isGoal(tag)){ // daca e goal
-                    System.out.println("G");
                     currentGoal = createGoalByRow(currentRow);
 
                 }
                 else { // daca e task
-                    System.out.println("T");
+                    //Task currentTask = createTaskByRow(currentRow, currentGoal);
+                    //currentTasks.add(currentTask);
                 }
 
             }
@@ -89,21 +90,39 @@ public class Excel {
         return matcher.find();
     }
 
+    //// get info from excel and convert into GOAL for Model Data Management
     private static Goal createGoalByRow(Row row) {
-        //todo ???
-        //Workbook workbook = createWorkbook();
-        //int lastRowIndex = sheet.getLastRowNum();
-        //System.out.println("last row " + lastRowIndex);
+        Date estimatedDate = row.getCell(ESDA).getDateCellValue();
+        String descriptionString = row.getCell(DESC).getStringCellValue();
+        Description description = new Description(descriptionString, estimatedDate);
 
-        //String description
-        Goal resultGoal = null;
+        Goal resultGoal = new Goal(description);
         return resultGoal;
     }
 
-    private static boolean emptyRow (Row row){
-        return row == null;
+    //// get info from excel and convert into TASK for Model Data Management
+    private static Task createTaskByRow (Row row, Goal goal){
+        ///todo some parsing....
+        // description
+        Date estimatedDate = row.getCell(ESDA).getDateCellValue();
+        String descriptionString = row.getCell(DESC).getStringCellValue();
+        Description description = new Description(descriptionString, estimatedDate);
+
+        //estimatedTime
+        String estimatedTimeString = row.getCell(ESTI).getStringCellValue();
+        int indexOfSeparator = estimatedTimeString.indexOf(':');
+        int hours = Integer.parseInt(estimatedTimeString.substring(0, indexOfSeparator));
+        int minutes = Integer.parseInt(estimatedTimeString.substring(indexOfSeparator, estimatedTimeString.length()));
+        Time estimatedTime = new Time(hours, minutes);
+
+        Task resultTask = new Task(goal, description, estimatedTime);
+        return resultTask;
     }
 
+    private static boolean emptyRow (Row row){
+        if (row == null) System.out.println("wtf romania");
+        return row.getCell(TAG) == null;
+    }
 
     private static Workbook createWorkbook() {
         Workbook workbook = null;
@@ -118,7 +137,6 @@ public class Excel {
         }
         return workbook;
     }
-
 
     public static void insertGoal(Goal newGoal) {
         Workbook workbook = createWorkbook();

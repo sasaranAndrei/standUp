@@ -88,4 +88,16 @@ public class Goal extends AbstractGoal{
         String result = procent + "%";
         return result;
     }
+
+    public String getShortDescription (){
+        String description = getDescription().getDescription();
+        int descriptionLength = description.length();
+
+        String shortDescription = "";
+        if (descriptionLength > 20){
+            shortDescription = description.substring(0,20);
+        }
+        else shortDescription = description;
+        return shortDescription;
+    }
 }
