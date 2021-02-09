@@ -1,6 +1,7 @@
 package controller;
 
 import model.Description;
+import model.Excel;
 import model.Goal;
 import model.StandUpModel;
 import view.StandUpView;
@@ -20,6 +21,9 @@ public class StandUpController {
         this.model = model;
         this.view = view;
 
+        /// init data in the model
+        //this.model.loadData();
+
         //todo a method for adding all the listeners...
         //todo methods view.addXListener => in View avem view.component.addActionListener(XListener)
         this.view.addManageGoalsListener(new ManageGoalListener());
@@ -31,7 +35,7 @@ public class StandUpController {
         StandUpView  view   = new StandUpView();
         StandUpController controller = new StandUpController(model, view);
 
-        model.loadData();
+
     }
 
     /// listener for ManageGoals Button
@@ -74,12 +78,16 @@ public class StandUpController {
         public void actionPerformed(ActionEvent e) { // it kinda works!
             System.out.println("Add the goal");
             //MOMENTAN PREUSPUNEM CA DATELES VALIDE
+            //todo format like : "dd/MM/yyyy"
             Date date = view.manageGoalsFrame.getSelectedDate();
             String descriptionString = view.manageGoalsFrame.getDescriptionString();
             Description description = new Description(descriptionString, date);
 
             Goal goal = new Goal(description);
             System.out.println("goal that we established " + goal);
+            Excel.insertGoal(goal);
+
+            //todo: dupa ce dau add, sa curat descriptionu si dateul
 
             //System.out.println(date);
             //TODO PROCESS DATE. maybe I'll do a ParserClass for all the parsing stuff in the project.

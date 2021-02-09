@@ -82,4 +82,10 @@ public class Goal extends AbstractGoal{
                 + "\n/./ estimatedWorkTime : " + estimatedTime + " /./ realizedWorkTime : "  + realizedTime
                 + "\n/./ the list of task : \n" + tasks;
     }
+
+    public String getProcent () {
+        int procent = (int) progress.getValue() * 100;
+        String result = procent + "%";
+        return result;
+    }
 }
