@@ -11,6 +11,7 @@ public class ViewUtils {
     /// constants
     static final int RIGHT_BOTTOM_CORNER_Y = 200;
     static final int COMPONENT_TEXT_SIZE = 12;
+    //static final int COMPONENT_TEXT_SIZE_SMALL = 10;
     static final int SPACE_BETWEEN_COMPONENTS = 2;
     // components color constants
     static final Color MAIN_PANEL_COLOR = Color.decode("#fece6c");

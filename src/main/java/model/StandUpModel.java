@@ -8,6 +8,8 @@ public class StandUpModel {
     /// fields
     private ArrayList<Goal> allGoals;
 
+    //TODO: S-ar putea sa nu mai fie valabil ce am scris mai jos
+    //pt ca la fiecare insereare citesc / scriu in excel.
     private ArrayList<Task> currentTasks; // tasks that will be modified in View, and will get modified from Controller
     private ArrayList<Goal> newGoals; // goals  created from the View
     private ArrayList<Task> deleteTasks; // tasks that must be deleted (View)
@@ -44,6 +46,8 @@ public class StandUpModel {
     }
 
     public ArrayList<Goal> getGoals() {
+        loadData();
+        System.out.println("there are " + allGoals.size() + " goals.");
         return allGoals;
     }
 }

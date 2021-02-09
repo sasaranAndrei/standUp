@@ -9,14 +9,12 @@ import java.awt.event.WindowListener;
 import java.util.ArrayList;
 import java.util.Date;
 
-import com.toedter.calendar.JCalendar;
 import com.toedter.calendar.JDateChooser;
-import controller.*;
 
 //todo add manually all the listeners from controller
 import controller.StandUpController.AddGoalListener;
 import controller.StandUpController.EditGoalListener;
-import controller.StandUpController.SelectGoalListener;
+import controller.StandUpController.CreateTaskListener;
 import model.Goal;
 
 
@@ -73,6 +71,7 @@ public class ManageGoalsFrame {
     /// for now, we just save them
     private AddGoalListener addGoalListener;
     private EditGoalListener editGoalListener;
+    private CreateTaskListener createTaskListener;
 
     //TODO poate i schimb numele in INIT addGoalListeenr...
     public void initAddGoalListener(AddGoalListener addGoalListener){
@@ -85,6 +84,10 @@ public class ManageGoalsFrame {
         for (Goal goal : goals){
             goalsString.add(goal.getShortDescription());
         }
+    }
+
+    public void initCreateTaskListener(CreateTaskListener createTaskListener) {
+        this.createTaskListener = createTaskListener;
     }
     //****************************** LISTENERS **************************************
 
@@ -106,6 +109,8 @@ public class ManageGoalsFrame {
     public String getDescriptionString() {
         return descriptionString;
     }
+
+
 
     //{{{{{{{{{{{{{data from components from this view (used in controller)}}}}}}}}}}}}
 
@@ -226,40 +231,90 @@ public class ManageGoalsFrame {
     private class EditGoalPanel extends JPanel {
 
         private JComboBox<String> selectGoal;
-        private JButton addTask;
+        private JButton createTask;
         private JButton deleteTask;
 
-        private JPanel displayPanelEdit;
+        private JPanel taskDisplayPanel;
 
         public EditGoalPanel() {
             // size & layout
             this.setSize(ViewUtils.MAIN_PANEL_DIMENSION);
             this.setLayout(new BorderLayout());
 
-            this.add(new JLabel("PLM"));
-
             // components
-            //initComponents();
-            //frame.repaint();
+            initComponents();
+            frame.repaint();
             frame.validate();
 
         }
 
         private void initComponents() {
-           this.add(createSelectPanel());
-
+           this.add(createSelectPanel(), BorderLayout.NORTH);
         }
 
         private JPanel createSelectPanel (){
-            System.out.println("here in create select panel");
             JPanel selectPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
             selectGoal = new JComboBox<>();
             selectGoal.setModel(new DefaultComboBoxModel<>(goalsString.toArray(new String[0])));
-            selectGoal.addActionListener(new StandUpController.SelectGoalListener());
+            //nu cred ca are nevoie de actionListener pentru ca odata ce da pe Add/Rmv Task
+            // se ia infromatia despre Goalul selectatat.
+            selectPanel.add(selectGoal);
+
+            selectPanel.add(new JLabel(" "));
+
+            createTask = new JButton("ADD TASK");
+            createTask.setFont(new Font("Bodoni MT Black", Font.BOLD, ViewUtils.COMPONENT_TEXT_SIZE));
+            createTask.setForeground(ViewUtils.BUTTON_COLOR);
+            createTask.setOpaque(true);
+            createTask.setBackground(ViewUtils.BUTTON_BACKGROUND_COLOR);
+            //createTask.addActionListener(createTaskListener); ///// listener that was init
+            createTask.addActionListener(e -> {
+                // comutare de la DEL TASK -> ADD TASK
+                if (taskDisplayPanel != null) this.remove(taskDisplayPanel);
+                taskDisplayPanel = new CreateTaskPanel();// / editGoalPanel
+                this.add(taskDisplayPanel, BorderLayout.CENTER);
+                this.revalidate();
+                this.repaint();
+
+            });
+            selectPanel.add(createTask);
+
+            selectPanel.add(new JLabel(" "));
+
+            deleteTask = new JButton("DEL TASK");
+            deleteTask.setFont(new Font("Bodoni MT Black", Font.BOLD, ViewUtils.COMPONENT_TEXT_SIZE));
+            deleteTask.setForeground(ViewUtils.BUTTON_COLOR);
+            deleteTask.setOpaque(true);
+            deleteTask.setBackground(ViewUtils.BUTTON_BACKGROUND_COLOR);
+            //deleteTask.addActionListener(); ///// listener that was init
+            selectPanel.add(deleteTask);
 
             return selectPanel;
         }
+
+
+
+        private class CreateTaskPanel extends JPanel {
+            private JLabel descriptionLabel;
+            private JTextField enterDescription;
+            private JPanel estimatedDatePanel;
+            private JButton addGoalButton;
+
+            public CreateTaskPanel() {
+                this.setLayout(new GridBagLayout());
+                this.add(new JLabel("add task"));
+                initComponents();
+                this.repaint();
+                this.validate();
+
+            }
+
+            void initComponents (){
+
+            }
+        }
+
     }
 
 

@@ -36,6 +36,8 @@ public class Excel {
     public static final String DATE_FORMAT = "dd/MM/yyyy";
     public static final String SHEET_NAME = "StandApp";
 
+    private static final String FINISH = "FINISH";
+
 
 
 
@@ -56,7 +58,12 @@ public class Excel {
             if (emptyRow(currentRow)) { // EMPTY ROW = e un rand de pauza intre goaluri
                 //todo: saveGoalWithHisTask & reinitCurrentGoalAndHisTask
                 System.out.println("TAG -> empty row -> save");
+                //if (currentGoal != null)
+                    goals.add(currentGoal);
+                //else System.out.println(row);
 
+                currentGoal = null;
+                currentTasks.clear();
             }
 
             else { // ABSTRACT GOAL ROW = e un rand in care sunt info legate de Goal / Task
@@ -121,7 +128,7 @@ public class Excel {
 
     private static boolean emptyRow (Row row){
         if (row == null) System.out.println("wtf romania");
-        return row.getCell(TAG) == null;
+        return row.getCell(TAG) == null || row.getCell(TAG).getStringCellValue().equals(FINISH);
     }
 
     private static Workbook createWorkbook() {

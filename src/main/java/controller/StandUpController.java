@@ -16,19 +16,22 @@ public class StandUpController {
     private StandUpModel model;
     private StandUpView  view;
 
-    public StandUpController(StandUpModel model, StandUpView view) {
-        this.model = model;
-        this.view = view;
+    public StandUpController(StandUpModel theModel, StandUpView theView) {
+        model = theModel;
+        view = theView;
 
         /// init data in the model
-        this.model.loadData();
+        //this.model.loadData();
 
         //todo a method for adding all the listeners...
         //todo methods view.addXListener => in View avem view.component.addActionListener(XListener)
-        this.view.addManageGoalsListener(new ManageGoalListener());
-        this.view.manageGoalsFrame.initAddGoalListener(new AddGoalListener());
-        this.view.manageGoalsFrame.initEditGoalListener(new EditGoalListener(), model.getGoals());
+        view.addManageGoalsListener(new ManageGoalListener());
+        view.manageGoalsFrame.initAddGoalListener(new AddGoalListener());
+        view.manageGoalsFrame.initEditGoalListener(new EditGoalListener(), model.getGoals());
+        /// i-am trimis si goals urile ca sa le poata afisa comboBoxul
+        //in mod normal n-ar avea ce sa caute modelul in view.
 
+        view.manageGoalsFrame.initCreateTaskListener(new CreateTaskListener());
     }
 
     public static void main(String[] args) {
@@ -72,7 +75,8 @@ public class StandUpController {
     }
 
     /// listeners for Goal Manager Frame
-    public  class AddGoalListener implements ActionListener {
+    /// addGoal
+    public class AddGoalListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) { // it kinda works!
@@ -96,6 +100,7 @@ public class StandUpController {
         }
     }
 
+    // editGoal
     public class EditGoalListener implements ActionListener {
 
         @Override
@@ -104,7 +109,15 @@ public class StandUpController {
         }
     }
 
-    public static class SelectGoalListener implements ActionListener {
+    public class CreateTaskListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            //TODO
+        }
+    }
+
+    public class SelectGoalListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             //todo
