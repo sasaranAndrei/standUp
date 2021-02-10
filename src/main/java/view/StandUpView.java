@@ -190,7 +190,7 @@ public class StandUpView {
         private void addTaskLinePanel (){
             System.out.println("ADD TASK");
             // view
-            resizeWindow();
+            ViewUtils.resizeWindow(frame);
 
             TaskLinePanel taskLinePanel = new TaskLinePanel();
             tasks.add(taskLinePanel.task); // model
@@ -198,12 +198,7 @@ public class StandUpView {
             validate();
         }
 
-        private void resizeWindow (){
-            ViewUtils.FRAME_DIMENSION = new Dimension(ViewUtils.FRAME_DIMENSION.width, ViewUtils.FRAME_DIMENSION.height + ViewUtils.FRAME_INCREASE_DIMENSION);
-            frame.setSize(ViewUtils.FRAME_DIMENSION);
-            frame.validate();
 
-        }
     }
 
     private class TaskLinePanel extends JPanel {

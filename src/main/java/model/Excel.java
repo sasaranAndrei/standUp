@@ -18,7 +18,6 @@ import java.util.regex.Pattern;
 
 public class Excel {
     // ROW CONSTANTS
-    private static final int HEADER = 1;
     private static final int DATA_START = 2;
     // COLUMN CONSTANTS (am incercat cu Enum da nu mi place duma cu .ordinal)
     private static final int TAG = 0;
@@ -29,8 +28,6 @@ public class Excel {
     private static final int VAL = 5;
     private static final int LBL = 6;
 
-
-
     /// CONSTATS
     private static final String DB_LOCATION = "tasks.xlsx";
     public static final String DATE_FORMAT = "dd/MM/yyyy";
@@ -38,15 +35,12 @@ public class Excel {
 
     private static final String FINISH = "FINISH";
 
-
-
-
-    public static ArrayList<Goal> loadGoals (){
+    public static ArrayList<Goal> loadGoals () {
         // init excel reading stuff
         Workbook workbook = createWorkbook();
         Sheet sheet = workbook.getSheet(SHEET_NAME);
         int noOfRows = sheet.getLastRowNum() + 1;
-        System.out.println(noOfRows);
+        System.out.println("No of rows : " + noOfRows);
 
         // goals & tasks logic
         ArrayList<Goal> goals = new ArrayList<>(); // result list
@@ -55,37 +49,41 @@ public class Excel {
 
         for (int row = DATA_START; row < noOfRows; row++){
             Row currentRow = sheet.getRow(row);
-            if (emptyRow(currentRow)) { // EMPTY ROW = e un rand de pauza intre goaluri
-                //todo: saveGoalWithHisTask & reinitCurrentGoalAndHisTask
-                System.out.println("TAG -> empty row -> save");
-                //if (currentGoal != null)
-                    goals.add(currentGoal);
-                //else System.out.println(row);
+            if (currentRow == null) break;
 
-                currentGoal = null;
+            //todo // if (goal) / if (currentGoal != nill) saveGoalWithHisTasks / reinitCurrentGoalAndHisTasks()  { currentGoal = X, currentTaks = [ ] } //
+            Cell tag = currentRow.getCell(TAG); // read row Tag
+            if (isGoal(tag)){ // daca e GOAL
+                if (currentGoal != null){ // daca avem ce salva (nu e la prima iteratie)
+                    //todo => link currentGoal with currentTasks.
+                    currentGoal.setTasks(currentTasks);
+                    goals.add(currentGoal); // saveGoalWithHisTasks
+                }
+                // reinitCurrentGoalAndHisTasks
+                currentGoal = createGoalByRow(currentRow);
                 currentTasks.clear();
             }
-
-            else { // ABSTRACT GOAL ROW = e un rand in care sunt info legate de Goal / Task
-                //todo: if (goal) currentGoal = goal, else currentTasks += task
-                Cell tag = currentRow.getCell(TAG); // read row Tag
-                System.out.println("TAG -> " + tag);
-
-                if (isGoal(tag)){ // daca e goal
-                    currentGoal = createGoalByRow(currentRow);
-
-                }
-                else { // daca e task
-                    //Task currentTask = createTaskByRow(currentRow, currentGoal);
-                    //currentTasks.add(currentTask);
-                }
-
+            //todo currentTasks += X;
+            else { // daca e TASK
+                Task currentTask = createTaskByRow(currentRow, currentGoal);
+                currentTasks.add(currentTask);
             }
-
-
-
+        }
+        //todo: -> find a more elegant method
+        // save the last goal...
+        if (currentGoal != null){ // daca avem ce salva (nu e la prima iteratie)
+            //todo => link currentGoal with currentTasks.
+            currentGoal.setTasks(currentTasks);
+            goals.add(currentGoal); // saveGoalWithHisTasks
         }
 
+        /*
+        try {
+            workbook.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        */
         return goals;
     }
 
@@ -117,18 +115,13 @@ public class Excel {
 
         //estimatedTime
         String estimatedTimeString = row.getCell(ESTI).getStringCellValue();
-        int indexOfSeparator = estimatedTimeString.indexOf(':');
+        int indexOfSeparator = estimatedTimeString.indexOf('|');
         int hours = Integer.parseInt(estimatedTimeString.substring(0, indexOfSeparator));
-        int minutes = Integer.parseInt(estimatedTimeString.substring(indexOfSeparator, estimatedTimeString.length()));
+        int minutes = Integer.parseInt(estimatedTimeString.substring(indexOfSeparator + 1));
         Time estimatedTime = new Time(hours, minutes);
 
         Task resultTask = new Task(goal, description, estimatedTime);
         return resultTask;
-    }
-
-    private static boolean emptyRow (Row row){
-        if (row == null) System.out.println("wtf romania");
-        return row.getCell(TAG) == null || row.getCell(TAG).getStringCellValue().equals(FINISH);
     }
 
     private static Workbook createWorkbook() {
@@ -148,9 +141,9 @@ public class Excel {
     public static void insertGoal(Goal newGoal) {
         Workbook workbook = createWorkbook();
         Sheet sheet = workbook.getSheet(SHEET_NAME);
-        int lastRowIndex = sheet.getLastRowNum();
 
-        int newRowIndex = lastRowIndex + 2; // lasam un rand liber si incepem dupa el
+        int lastRowIndex = sheet.getLastRowNum();
+        int newRowIndex = lastRowIndex + 1;
         Row newRow = sheet.createRow(newRowIndex);
 
         // n a mers cu functie ca aveam
@@ -185,10 +178,10 @@ public class Excel {
         cell.setCellValue(newGoal.getProcent());
         // label
         cell = newRow.createCell(LBL);
-        cell.setCellValue(newGoal.getProgress().getLevel());
+        cell.setCellValue(newGoal.getProgress().getLabel());
         //////////////////////////////////////////////////////// end of populate
 
-        // scriem rezultatele
+        // write the results
         try{
             FileOutputStream fileOutputStream = new FileOutputStream(DB_LOCATION);
             workbook.write(fileOutputStream);
@@ -199,6 +192,24 @@ public class Excel {
             e.printStackTrace();
         }
 
+    }
+
+    // finish row bullshit
+    private static boolean emptyRow (Row row){
+        if (row == null) System.out.println("wtf romania");
+        return row.getCell(TAG) == null || row.getCell(TAG).getStringCellValue().equals(FINISH);
+    }
+    private static void insertFinishRow(Sheet sheet) {
+        int lastRowIndex = sheet.getLastRowNum();
+        Row finishRow = sheet.createRow(lastRowIndex + 1);
+        Cell finishCell = finishRow.createCell(TAG);
+        finishCell.setCellValue(FINISH);
+
+    }
+    private static void deleteFinishRow(Sheet sheet) {
+        int lastRowIndex = sheet.getLastRowNum();
+        Row deletedRow = sheet.getRow(lastRowIndex);
+        sheet.removeRow(deletedRow);
     }
 
 

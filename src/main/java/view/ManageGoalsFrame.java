@@ -76,14 +76,20 @@ public class ManageGoalsFrame {
     //TODO poate i schimb numele in INIT addGoalListeenr...
     public void initAddGoalListener(AddGoalListener addGoalListener){
         // il salvez aici pentru ca addGoal apare doar daca suntem in modul AddGoal din display panel
-        this.addGoalListener = addGoalListener;
+
+        addGoalPanel.addGoalButton.addActionListener(addGoalListener);
+//        this.addGoalListener = addGoalListener;
     }
 
-    public void initEditGoalListener(EditGoalListener editGoalListener, ArrayList<Goal> goals) {
-        this.editGoalListener = editGoalListener;
+    public void addEditGoalListener(EditGoalListener editGoalListener) {
+        //this.editGoalListener = editGoalListener;
+        this.mainPanel.editGoalButton.addActionListener(editGoalListener);
+        /*
         for (Goal goal : goals){
             goalsString.add(goal.getShortDescription());
         }
+
+         */
     }
 
     public void initCreateTaskListener(CreateTaskListener createTaskListener) {
@@ -95,7 +101,14 @@ public class ManageGoalsFrame {
     //[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[ data from Controller]]]]]]]]]]]]]]]]]]]]]]]]]]]]
 
     //private ArrayList<Goal> goals;
-    private ArrayList<String> goalsString = new ArrayList<>();
+    private ArrayList<String> goalsString;
+
+    // and their setters
+
+    public void setGoalsString(ArrayList<String> goalsString) {
+        this.goalsString = goalsString;
+    }
+
     //[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[ data from Controller]]]]]]]]]]]]]]]]]]]]]]]]]]]]
 
 
@@ -110,6 +123,16 @@ public class ManageGoalsFrame {
         return descriptionString;
     }
 
+    public void updateSelectGoalCombobox() {
+        editGoalPanel.selectGoal // combobox
+             .setModel(new DefaultComboBoxModel<>(goalsString.toArray(new String[0])));
+    }
+
+    public void updateGoalConstructor() {
+        ///// set the data used in controller.
+        descriptionString = addGoalPanel.enterDescription.getText();
+        selectedDate = addGoalPanel.calendar.getDate();
+    }
 
 
     //{{{{{{{{{{{{{data from components from this view (used in controller)}}}}}}}}}}}}
@@ -141,7 +164,7 @@ public class ManageGoalsFrame {
             addGoalButton.addActionListener(e -> {
                 // comutare de la AddGoal ->  EditGoal
                 if (displayPanel != null) frame.remove(displayPanel);
-                displayPanel = new AddGoalPanel(); // / addGoalPanel
+                displayPanel = addGoalPanel;
                 frame.add(displayPanel, BorderLayout.CENTER);
                 frame.revalidate();
                 frame.repaint();
@@ -160,11 +183,12 @@ public class ManageGoalsFrame {
             editGoalButton.addActionListener(e -> {
                 // comutare de la AddGoal ->  EditGoal
                 if (displayPanel != null) frame.remove(displayPanel);
-                displayPanel = new EditGoalPanel();// / editGoalPanel
+                displayPanel = editGoalPanel;
                 frame.add(displayPanel, BorderLayout.CENTER);
                 frame.revalidate();
                 frame.repaint();
             });
+            editGoalButton.addActionListener(editGoalListener);
             this.add(editGoalButton);
         }
     }
@@ -210,14 +234,10 @@ public class ManageGoalsFrame {
             calendar.setPreferredSize(new Dimension(110,25)); //todo -> VIEWUTILS
             estimatedDatePanel.add(calendar);
 
-            //estimatedDatePanel.add(new JLabel("aici o sa bag calendaru"));
             addGoalButton = new JButton("FINISH");
+            // todo -> buton calumea
+            /// ACTION LISTENER
             addGoalButton.addActionListener(addGoalListener);
-            addGoalButton.addActionListener(e -> {
-                ///// set the data used in controller.
-                descriptionString = enterDescription.getText();
-                selectedDate = calendar.getDate();
-            });
 
             estimatedDatePanel.add(addGoalButton);
 
@@ -230,7 +250,7 @@ public class ManageGoalsFrame {
 
     private class EditGoalPanel extends JPanel {
 
-        private JComboBox<String> selectGoal;
+        public JComboBox<String> selectGoal;
         private JButton createTask;
         private JButton deleteTask;
 
@@ -255,8 +275,11 @@ public class ManageGoalsFrame {
         private JPanel createSelectPanel (){
             JPanel selectPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
+            //todo => MAKE COMBOBOX SMALLER
             selectGoal = new JComboBox<>();
-            selectGoal.setModel(new DefaultComboBoxModel<>(goalsString.toArray(new String[0])));
+            if (goalsString != null){ // initialized when Edit is clicked
+                selectGoal.setModel(new DefaultComboBoxModel<>(goalsString.toArray(new String[0])));
+            }
             //nu cred ca are nevoie de actionListener pentru ca odata ce da pe Add/Rmv Task
             // se ia infromatia despre Goalul selectatat.
             selectPanel.add(selectGoal);
@@ -276,7 +299,6 @@ public class ManageGoalsFrame {
                 this.add(taskDisplayPanel, BorderLayout.CENTER);
                 this.revalidate();
                 this.repaint();
-
             });
             selectPanel.add(createTask);
 
@@ -288,31 +310,157 @@ public class ManageGoalsFrame {
             deleteTask.setOpaque(true);
             deleteTask.setBackground(ViewUtils.BUTTON_BACKGROUND_COLOR);
             //deleteTask.addActionListener(); ///// listener that was init
+            deleteTask.addActionListener(e -> {
+                // comutare de la ADD TASK -> DEL TASK
+                if (taskDisplayPanel != null) this.remove(taskDisplayPanel);
+                taskDisplayPanel = new DeleteTaskPanel();// / editGoalPanel
+                this.add(taskDisplayPanel, BorderLayout.CENTER);
+                this.revalidate();
+                this.repaint();
+            });
+
             selectPanel.add(deleteTask);
 
             return selectPanel;
         }
 
 
-
         private class CreateTaskPanel extends JPanel {
-            private JLabel descriptionLabel;
             private JTextField enterDescription;
-            private JPanel estimatedDatePanel;
-            private JButton addGoalButton;
+            private JTextField enterHours;
+            private JTextField enterMinutes;
+            private JButton finishAddTaskButton;
 
             public CreateTaskPanel() {
+                ViewUtils.makeFrameBigger(frame);
                 this.setLayout(new GridBagLayout());
-                this.add(new JLabel("add task"));
+
                 initComponents();
+
                 this.repaint();
                 this.validate();
 
             }
 
-            void initComponents (){
+            private void initComponents (){
+                //private JLabel descriptionLabel;
+                GridBagConstraints c = new GridBagConstraints();
+                c.fill = GridBagConstraints.HORIZONTAL;
+
+                JLabel descriptionLabel = new JLabel("Description:", SwingConstants.LEFT);
+                c.gridx = 0; c.gridy = 0;
+                c.gridwidth = 3;
+                this.add(descriptionLabel, c);
+
+                enterDescription = new JTextField(30);
+                c.gridx = 0; c.gridy = 1;
+                c.gridwidth = 3;
+                this.add(enterDescription, c);
+
+                c.gridwidth = 1;
+
+                JLabel estimatedTimeLabel = new JLabel("Estimated Time:", SwingConstants.LEFT);
+                c.gridx = 0; c.gridy = 2;
+                this.add(estimatedTimeLabel, c);
+
+                JLabel hoursLabel   = new JLabel("Hours: ", SwingConstants.LEFT);
+                c.gridx = 0; c.gridy = 3;
+                this.add(hoursLabel, c);
+
+                JLabel minutesLabel = new JLabel("Minutes: ", SwingConstants.LEFT);
+                c.gridx = 0; c.gridy = 4;
+                this.add(minutesLabel, c);
+
+                enterHours = new JTextField(5);
+                c.gridx = 1; c.gridy = 3;
+                this.add(enterHours, c);
+
+                enterMinutes = new JTextField(5);
+                c.gridx = 1; c.gridy = 4;
+                this.add(enterMinutes, c);
+
+                finishAddTaskButton = new JButton("CREATE TASK");
+                finishAddTaskButton.setFont(new Font("Bodoni MT Black", Font.BOLD, ViewUtils.BIGGER_COMPONENT_TEXT_SIZE));
+                finishAddTaskButton.setForeground(ViewUtils.BUTTON_COLOR);
+                finishAddTaskButton.setOpaque(true);
+                finishAddTaskButton.setBackground(ViewUtils.BUTTON_BACKGROUND_COLOR);
+                c.gridx = 2; c.gridy = 3;
+                c.ipady = 25;
+                c.gridheight = 2;
+                ////// ACTION LISTENER + clear the enterFields...
+                finishAddTaskButton.addActionListener(createTaskListener);
+                this.add(finishAddTaskButton, c);
 
             }
+        }
+
+        private class DeleteTaskPanel extends JPanel {
+
+            private JComboBox<String> selectTask;
+            private JButton removeTaskButton;
+
+            public DeleteTaskPanel() {
+                ViewUtils.makeFrameBigger(frame);
+                this.setLayout(new GridBagLayout());
+
+                initComponents();
+
+                this.repaint();
+                this.validate();
+            }
+
+            private void  initComponents (){
+                /*
+                GridBagConstraints c = new GridBagConstraints();
+                c.fill = GridBagConstraints.HORIZONTAL;
+
+                JLabel descriptionLabel = new JLabel("Description:", SwingConstants.LEFT);
+                c.gridx = 0; c.gridy = 0;
+                c.gridwidth = 3;
+                this.add(descriptionLabel, c);
+
+                enterDescription = new JTextField(30);
+                c.gridx = 0; c.gridy = 1;
+                c.gridwidth = 3;
+                this.add(enterDescription, c);
+
+                c.gridwidth = 1;
+
+                JLabel estimatedTimeLabel = new JLabel("Estimated Time:", SwingConstants.LEFT);
+                c.gridx = 0; c.gridy = 2;
+                this.add(estimatedTimeLabel, c);
+
+                JLabel hoursLabel   = new JLabel("Hours: ", SwingConstants.LEFT);
+                c.gridx = 0; c.gridy = 3;
+                this.add(hoursLabel, c);
+
+                JLabel minutesLabel = new JLabel("Minutes: ", SwingConstants.LEFT);
+                c.gridx = 0; c.gridy = 4;
+                this.add(minutesLabel, c);
+
+                enterHours = new JTextField(5);
+                c.gridx = 1; c.gridy = 3;
+                this.add(enterHours, c);
+
+                enterMinutes = new JTextField(5);
+                c.gridx = 1; c.gridy = 4;
+                this.add(enterMinutes, c);
+
+                finishAddTaskButton = new JButton("CREATE TASK");
+                finishAddTaskButton.setFont(new Font("Bodoni MT Black", Font.BOLD, ViewUtils.BIGGER_COMPONENT_TEXT_SIZE));
+                finishAddTaskButton.setForeground(ViewUtils.BUTTON_COLOR);
+                finishAddTaskButton.setOpaque(true);
+                finishAddTaskButton.setBackground(ViewUtils.BUTTON_BACKGROUND_COLOR);
+                c.gridx = 2; c.gridy = 3;
+                c.ipady = 25;
+                c.gridheight = 2;
+                ////// ACTION LISTENER + clear the enterFields...
+                finishAddTaskButton.addActionListener(createTaskListener);
+                this.add(finishAddTaskButton, c);
+
+                 */
+            }
+
         }
 
     }

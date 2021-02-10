@@ -9,6 +9,7 @@ import view.ViewUtils;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.Date;
 
 public class StandUpController {
@@ -27,7 +28,7 @@ public class StandUpController {
         //todo methods view.addXListener => in View avem view.component.addActionListener(XListener)
         view.addManageGoalsListener(new ManageGoalListener());
         view.manageGoalsFrame.initAddGoalListener(new AddGoalListener());
-        view.manageGoalsFrame.initEditGoalListener(new EditGoalListener(), model.getGoals());
+        view.manageGoalsFrame.addEditGoalListener(new EditGoalListener());
         /// i-am trimis si goals urile ca sa le poata afisa comboBoxul
         //in mod normal n-ar avea ce sa caute modelul in view.
 
@@ -83,6 +84,8 @@ public class StandUpController {
             System.out.println("Add the goal");
             //MOMENTAN PREUSPUNEM CA DATELES VALIDE
             //todo format like : "dd/MM/yyyy"
+            view.manageGoalsFrame.updateGoalConstructor();
+
             Date date = view.manageGoalsFrame.getSelectedDate();
             String descriptionString = view.manageGoalsFrame.getDescriptionString();
             Description description = new Description(descriptionString, date);
@@ -105,7 +108,15 @@ public class StandUpController {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            //TODO
+            System.out.println("u here madafaca?");
+            model.loadData();
+            /// convert goals to strings
+            ArrayList<String> goalsString = new ArrayList<>();
+            for (Goal goal : model.getGoals()){
+                goalsString.add(goal.getShortDescription());
+            }
+            view.manageGoalsFrame.setGoalsString(goalsString);
+            view.manageGoalsFrame.updateSelectGoalCombobox();
         }
     }
 

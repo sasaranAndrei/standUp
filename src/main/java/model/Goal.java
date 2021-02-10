@@ -27,6 +27,11 @@ public class Goal extends AbstractGoal{
         this.tasks          = new ArrayList<>();            // no tasks init.
     }
 
+    public void setTasks(ArrayList<Task> tasks) {
+        this.tasks = tasks;
+        //todo process all information based on this new Tasks
+    }
+
     public void addTask (Task newTask){
         tasks.add(newTask); // adaugam taskul la lista goalului
         // si actualizam timpii

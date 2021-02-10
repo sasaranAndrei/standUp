@@ -21,7 +21,8 @@ public class Time {
 
     @Override
     public String toString() {
-        return String.format("%02d:%02d", hours, minutes); // 00:00 - 2decimal format
+        //return String.format("%02d:%02d", hours, minutes); // 00:00 - 2decimal format
+        return hours + "|" + minutes;
     }
 
 }

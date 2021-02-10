@@ -63,6 +63,9 @@ public class Progress {
         return value;
     }
 
+    public String getLabel() {
+        return label;
+    }
 
     @Override
     public String toString() {
