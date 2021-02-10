@@ -98,9 +98,11 @@ public class Goal extends AbstractGoal{
         String description = getDescription().getDescription();
         int descriptionLength = description.length();
 
-        String shortDescription = "";
-        if (descriptionLength > 20){
-            shortDescription = description.substring(0,20);
+        int maxLength = 20;
+
+        String shortDescription;
+        if (descriptionLength > maxLength){
+            shortDescription = description.substring(0,maxLength);
         }
         else shortDescription = description;
         return shortDescription;

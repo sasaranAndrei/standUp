@@ -46,7 +46,6 @@ public class StandUpModel {
     }
 
     public ArrayList<Goal> getGoals() {
-        loadData();
         System.out.println("there are " + allGoals.size() + " goals.");
         return allGoals;
     }

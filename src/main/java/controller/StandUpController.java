@@ -9,6 +9,7 @@ import view.ViewUtils;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.lang.reflect.Executable;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -20,9 +21,6 @@ public class StandUpController {
     public StandUpController(StandUpModel theModel, StandUpView theView) {
         model = theModel;
         view = theView;
-
-        /// init data in the model
-        //this.model.loadData();
 
         //todo a method for adding all the listeners...
         //todo methods view.addXListener => in View avem view.component.addActionListener(XListener)
@@ -56,6 +54,7 @@ public class StandUpController {
         @Override
         public void actionPerformed(ActionEvent e) {
             //TODO
+
         }
     }
 
@@ -93,8 +92,8 @@ public class StandUpController {
             Goal goal = new Goal(description);
             System.out.println("goal that we established " + goal);
             Excel.insertGoal(goal);
-
             //todo: dupa ce dau add, sa curat descriptionu si dateul
+            //view.manageGoalsFrame.cleanGoalConstructor();
 
             //System.out.println(date);
             //TODO PROCESS DATE. maybe I'll do a ParserClass for all the parsing stuff in the project.
@@ -105,10 +104,8 @@ public class StandUpController {
 
     // editGoal
     public class EditGoalListener implements ActionListener {
-
         @Override
         public void actionPerformed(ActionEvent e) {
-            System.out.println("u here madafaca?");
             model.loadData();
             /// convert goals to strings
             ArrayList<String> goalsString = new ArrayList<>();
@@ -117,6 +114,7 @@ public class StandUpController {
             }
             view.manageGoalsFrame.setGoalsString(goalsString);
             view.manageGoalsFrame.updateSelectGoalCombobox();
+            //Excel.shiftRow();
         }
     }
 

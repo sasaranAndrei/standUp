@@ -8,8 +8,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.regex.Matcher;
@@ -84,6 +82,10 @@ public class Excel {
             e.printStackTrace();
         }
         */
+
+        System.out.println("the loadede data is :");
+        System.out.println(goals);
+
         return goals;
     }
 
@@ -181,6 +183,13 @@ public class Excel {
         cell.setCellValue(newGoal.getProgress().getLabel());
         //////////////////////////////////////////////////////// end of populate
 
+        writeAndCloseWorkbook(workbook);
+
+
+
+    }
+
+    private static void writeAndCloseWorkbook(Workbook workbook){
         // write the results
         try{
             FileOutputStream fileOutputStream = new FileOutputStream(DB_LOCATION);
@@ -191,7 +200,6 @@ public class Excel {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
     // finish row bullshit
@@ -213,5 +221,11 @@ public class Excel {
     }
 
 
+    public static void shiftRow() { // merge
+        Workbook workbook = createWorkbook();
+        Sheet sheet = workbook.getSheet(SHEET_NAME);
 
+        sheet.shiftRows(7,8,1);
+        writeAndCloseWorkbook(workbook);
+    }
 }

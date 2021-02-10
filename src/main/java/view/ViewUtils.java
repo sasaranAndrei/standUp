@@ -29,8 +29,6 @@ public class ViewUtils {
     // fonts
     static final Font TEXT_FIELD_FONT = new Font("Bodoni MT Black", Font.BOLD, ViewUtils.COMPONENT_TEXT_SIZE);
 
-
-
     public static void setFrameLocationBottomRightCorner(JFrame frame) {
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
         GraphicsDevice defaultScreen = ge.getDefaultScreenDevice();

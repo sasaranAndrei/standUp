@@ -134,6 +134,13 @@ public class ManageGoalsFrame {
         selectedDate = addGoalPanel.calendar.getDate();
     }
 
+    public void cleanGoalConstructor() {
+        descriptionString = "";
+        selectedDate = null;
+        addGoalPanel.repaint();
+        addGoalPanel.validate();
+    }
+
 
     //{{{{{{{{{{{{{data from components from this view (used in controller)}}}}}}}}}}}}
 
@@ -277,6 +284,8 @@ public class ManageGoalsFrame {
 
             //todo => MAKE COMBOBOX SMALLER
             selectGoal = new JComboBox<>();
+            // 18 litere
+            selectGoal.setPrototypeDisplayValue("123456789012345678");
             if (goalsString != null){ // initialized when Edit is clicked
                 selectGoal.setModel(new DefaultComboBoxModel<>(goalsString.toArray(new String[0])));
             }
@@ -323,7 +332,6 @@ public class ManageGoalsFrame {
 
             return selectPanel;
         }
-
 
         private class CreateTaskPanel extends JPanel {
             private JTextField enterDescription;
