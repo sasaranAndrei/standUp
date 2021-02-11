@@ -25,6 +25,9 @@ public class Task extends AbstractGoal{
         return progress.getValue();
     }
 
+    public Goal getGoal() {
+        return goal;
+    }
 
     /// GETTERS - override methods from AbstractGoal
     @Override

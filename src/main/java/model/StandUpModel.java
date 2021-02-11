@@ -49,4 +49,25 @@ public class StandUpModel {
         System.out.println("there are " + allGoals.size() + " goals.");
         return allGoals;
     }
+
+    public ArrayList<String> getGoalsString() {
+        ArrayList<String> goalsString = new ArrayList<>();
+        for (Goal goal : allGoals){
+            goalsString.add(goal.getShortDescription());
+        }
+        return goalsString;
+    }
+
+    /* teoretic al trebui sa l gaseasca pt ca ordinea normala e ori
+        1) intra-n aplicatie si da pe add task in MAIN sau edit task in MANAGE [caz in care inainte se citesc corect goalurile din excel]
+        2) da add goal, si ca sa i bage taskuri goalului respectiv da pe edit task in MANAGE [...]
+
+     */
+    public Goal findGoalByIndex(int selectedGoalIndex) {
+        if (selectedGoalIndex < 0 || selectedGoalIndex >= allGoals.size()) {
+            System.out.println("NU EXISTA FRA GOALU ASTA EJ DILAU");
+            return null;
+        }
+        return allGoals.get(selectedGoalIndex);
+    }
 }

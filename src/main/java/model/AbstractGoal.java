@@ -13,5 +13,22 @@ public abstract class AbstractGoal {
     public boolean isDone (){
         return getProgress().getLevel() == Progress.LAST_LEVEL;
     }
+    public String getProcent () {
+        int procent = (int) getProgress().getValue() * 100;
+        String result = procent + "%";
+        return result;
+    }
+    public String getShortDescription (){
+        String description = getDescription().getDescription();
+        int descriptionLength = description.length();
 
+        int maxLength = 20;
+
+        String shortDescription;
+        if (descriptionLength > maxLength){
+            shortDescription = description.substring(0,maxLength);
+        }
+        else shortDescription = description;
+        return shortDescription;
+    }
 }

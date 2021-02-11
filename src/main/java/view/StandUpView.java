@@ -99,8 +99,6 @@ public class StandUpView {
         }
     }
 
-
-
     private class TasksPanel extends JPanel{
         // model
         private ArrayList<Task> tasks;

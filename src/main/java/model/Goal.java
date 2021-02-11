@@ -27,6 +27,9 @@ public class Goal extends AbstractGoal{
         this.tasks          = new ArrayList<>();            // no tasks init.
     }
 
+    //TODO A FUCKING GET DESCRIPTION STRING CA M AM SATURAT SA SCRIU
+    // GOAL.GETDESCRIPTION.GETDESCRIPTION!!!!
+
     public void setTasks(ArrayList<Task> tasks) {
         this.tasks = tasks;
         //todo process all information based on this new Tasks
@@ -86,25 +89,5 @@ public class Goal extends AbstractGoal{
         return "Goal about : " + description.getDescription() + " /./ estimated date : " + description.getEstimatedDate()
                 + "\n/./ estimatedWorkTime : " + estimatedTime + " /./ realizedWorkTime : "  + realizedTime
                 + "\n/./ the list of task : \n" + tasks;
-    }
-
-    public String getProcent () {
-        int procent = (int) progress.getValue() * 100;
-        String result = procent + "%";
-        return result;
-    }
-
-    public String getShortDescription (){
-        String description = getDescription().getDescription();
-        int descriptionLength = description.length();
-
-        int maxLength = 20;
-
-        String shortDescription;
-        if (descriptionLength > maxLength){
-            shortDescription = description.substring(0,maxLength);
-        }
-        else shortDescription = description;
-        return shortDescription;
     }
 }

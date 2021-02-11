@@ -37,7 +37,7 @@ public class Excel {
         // init excel reading stuff
         Workbook workbook = createWorkbook();
         Sheet sheet = workbook.getSheet(SHEET_NAME);
-        int noOfRows = sheet.getLastRowNum() + 1;
+        int noOfRows = getNumberOfRows(sheet);
         System.out.println("No of rows : " + noOfRows);
 
         // goals & tasks logic
@@ -54,7 +54,10 @@ public class Excel {
             if (isGoal(tag)){ // daca e GOAL
                 if (currentGoal != null){ // daca avem ce salva (nu e la prima iteratie)
                     //todo => link currentGoal with currentTasks.
-                    currentGoal.setTasks(currentTasks);
+                    //nu cred ca merge varianta de mai jos ca practic tu i atribui o referinta
+                    //todo => ar trebui sa fac cu CLONE cred. DAR voi incerca sa fac leg
+                    // task <-> goal in createTaskByRow
+                    //currentGoal.setTasks(currentTasks);
                     goals.add(currentGoal); // saveGoalWithHisTasks
                 }
                 // reinitCurrentGoalAndHisTasks
@@ -64,7 +67,7 @@ public class Excel {
             //todo currentTasks += X;
             else { // daca e TASK
                 Task currentTask = createTaskByRow(currentRow, currentGoal);
-                currentTasks.add(currentTask);
+                currentTasks.add(currentTask); // nu cred ca o sa mi l mai trbeuieasca
             }
         }
         //todo: -> find a more elegant method
@@ -83,10 +86,14 @@ public class Excel {
         }
         */
 
-        System.out.println("the loadede data is :");
+        System.out.println("the LOADED data is :");
         System.out.println(goals);
 
         return goals;
+    }
+
+    private static int getNumberOfRows(Sheet sheet) {
+        return sheet.getLastRowNum() + 1;
     }
 
     private static boolean isGoal(Cell tag) {
@@ -122,7 +129,11 @@ public class Excel {
         int minutes = Integer.parseInt(estimatedTimeString.substring(indexOfSeparator + 1));
         Time estimatedTime = new Time(hours, minutes);
 
+        // make the link between ::: task <-> goal
         Task resultTask = new Task(goal, description, estimatedTime);
+        goal.addTask(resultTask); // aici goal e doar o referinta, deci ar trebui sa mearga.
+
+        //System.out.println("task readed from excel : " + resultTask);
         return resultTask;
     }
 
@@ -140,7 +151,7 @@ public class Excel {
         return workbook;
     }
 
-    public static void insertGoal(Goal newGoal) {
+    public static void insertGoalRow(Goal newGoal) {
         Workbook workbook = createWorkbook();
         Sheet sheet = workbook.getSheet(SHEET_NAME);
 
@@ -184,9 +195,80 @@ public class Excel {
         //////////////////////////////////////////////////////// end of populate
 
         writeAndCloseWorkbook(workbook);
+    }
+
+    public static void insertTaskRow (Task newTask) {
+        Workbook workbook = createWorkbook();
+        Sheet sheet = workbook.getSheet(SHEET_NAME);
+
+        Goal goalOfNewTask = newTask.getGoal();
+        int goalIndex = findGoalRowIndex(sheet, goalOfNewTask);
+        int shiftIndex = goalIndex + goalOfNewTask.numberOfTasks(); //  the goal that was just introduced
+        int newRowIndex = shiftIndex + 1;
+        System.out.println("gIdx : " + goalIndex);
+        System.out.println("sIdx : " + shiftIndex);
+        System.out.println("rowIdx : " + newRowIndex);
+        System.out.println("lastRow : " + sheet.getLastRowNum());
+        //todo : verifica sa nu fie ultimu rand
+        if (shiftIndex != sheet.getLastRowNum()){
+            //todo : noi trebuie sa shiftam intre [goalIndex + goals.tasksSize] si [goalIndex + goals.tasksSize + 1]
+            sheet.shiftRows(newRowIndex, sheet.getLastRowNum(), 1); // facem loc de taskul nou ce trebuie adaugat
+        }
+
+        Row newRow = sheet.createRow(newRowIndex);
+        //todo : SCRIEM INFORMATIA (nou TASK) in Excel la index newRowIndex
+        //////////////////////////////////////////////////////// start of populate
+        Cell cell;
+        // tag
+        cell = newRow.createCell(TAG);
+        cell.setCellValue("Task");
+        // description
+        cell = newRow.createCell(DESC);
+        cell.setCellValue(newTask.getDescription().getDescription());
+        // estimated date
+        CellStyle cellStyle = workbook.createCellStyle();
+        CreationHelper createHelper = workbook.getCreationHelper();
+        cellStyle.setDataFormat(createHelper.createDataFormat().getFormat(DATE_FORMAT));
+        cell = newRow.createCell(ESDA);
+        cell.setCellValue(newTask.getDescription().getEstimatedDate());
+        cell.setCellStyle(cellStyle);
+
+        // estimated time
+        cell = newRow.createCell(ESTI);
+        cell.setCellValue(newTask.getEstimatedTime().toString());
+        // realized time
+        cell = newRow.createCell(RETI);
+        cell.setCellValue(newTask.getRealizedTime().toString());
+
+        // value
+        //todo daca nu mere bine treaba revin la value simplu si aia e
+        cell = newRow.createCell(VAL);
+        cell.setCellValue(newTask.getProcent());
+        // label
+        cell = newRow.createCell(LBL);
+        cell.setCellValue(newTask.getProgress().getLabel());
+        //////////////////////////////////////////////////////// end of populate
+        System.out.println("u here ma frend ?");
+        writeAndCloseWorkbook(workbook);
+    }
 
 
-
+    private static int findGoalRowIndex(Sheet sheet, Goal goalOfNewTask) {
+        int noOfRows = getNumberOfRows(sheet);
+        for (int i = DATA_START; i < noOfRows; i++){
+            Row row = sheet.getRow(i);
+            Cell tag = row.getCell(TAG); // read row Tag
+            if (isGoal(tag)){ // mai ramane de veriricat descriereea
+                //String searchedGoalShortDescription = goalOfNewTask.getShortDescription();
+                String searchedGoalDescription = goalOfNewTask.getDescription().getDescription();
+                String excelGoalDescription = row.getCell(DESC).getStringCellValue();
+                if (searchedGoalDescription.equals(excelGoalDescription)){ // am gasit goalulu
+                    return i;
+                }
+            }
+        }
+        System.out.println("GOALU NU A FOST GASIT IN EXCEL");
+        return -1;
     }
 
     private static void writeAndCloseWorkbook(Workbook workbook){
