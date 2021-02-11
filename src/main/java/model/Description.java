@@ -1,5 +1,7 @@
 package model;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Description {
@@ -17,5 +19,14 @@ public class Description {
 
     public Date getEstimatedDate() {
         return estimatedDate;
+    }
+
+    public String getStringDate() {
+        String result = "";
+        if (estimatedDate != null){
+            DateFormat dateFormat = new SimpleDateFormat(Excel.DATE_FORMAT);
+            result = dateFormat.format(estimatedDate);
+        }
+        return result;
     }
 }

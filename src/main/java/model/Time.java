@@ -9,8 +9,6 @@ public class Time {
         this.minutes = minutes;
     }
 
-
-
     public void addTime(Time addedTime) {
         int totalHours      = hours     + addedTime.hours;
         int totalMinutes    = minutes   + addedTime.minutes;
@@ -18,11 +16,17 @@ public class Time {
         minutes = totalMinutes % 60; // all the minutes that wasn't converted
     }
 
-
     @Override
     public String toString() {
         //return String.format("%02d:%02d", hours, minutes); // 00:00 - 2decimal format
         return hours + "|" + minutes;
     }
 
+    public int getHours() {
+        return hours;
+    }
+
+    public int getMinutes() {
+        return minutes;
+    }
 }

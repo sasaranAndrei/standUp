@@ -68,6 +68,16 @@ public class StandUpModel {
             System.out.println("NU EXISTA FRA GOALU ASTA EJ DILAU");
             return null;
         }
+        System.out.println("A fost selectat goalul : " + selectedGoalIndex);
+        System.out.println(allGoals.get(selectedGoalIndex));
         return allGoals.get(selectedGoalIndex);
+    }
+
+    public ArrayList<String> getTasksStringOfGoal (Goal selectedGoal) {
+        ArrayList<String> tasksString = new ArrayList<>();
+        for (Task task : selectedGoal.getTasks()){
+            tasksString.add(task.getShortDescription());
+        }
+        return tasksString;
     }
 }

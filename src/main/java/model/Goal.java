@@ -69,6 +69,9 @@ public class Goal extends AbstractGoal{
         return progress;
     }
 
+    public ArrayList<Task> getTasks() {
+        return tasks;
+    }
 
     public void updateProgress() {
         float updatedValue = computeNewProgressValue();

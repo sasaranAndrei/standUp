@@ -1,11 +1,13 @@
 package controller;
 
 import model.*;
+import org.apache.poi.ss.usermodel.DataFormat;
 import view.StandUpView;
 import view.ViewUtils;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -24,9 +26,13 @@ public class StandUpController {
         view.addManageGoalsListener(new ManageGoalListener());
 
         /// MANAGE GOALS ActionListeners
+        /// ADD GOAL
         view.manageGoalsFrame.addAddGoalListener(new AddGoalListener());
+        /// EDIT GOAL
         view.manageGoalsFrame.addEditGoalListener(new EditGoalListener());
         view.manageGoalsFrame.addCreateTaskListener(new CreateTaskListener());
+        view.manageGoalsFrame.addSelectTaskListener(new SelectTaskListener());
+        view.manageGoalsFrame.addTaskChangedListener(new TaskChangedListener());
     }
 
     public static void main(String[] args) {
@@ -111,7 +117,6 @@ public class StandUpController {
             /// make link with GUI
             view.manageGoalsFrame.setGoalsString(goalsString);
             view.manageGoalsFrame.updateSelectGoalCombobox();
-            //Excel.shiftRow();
         }
     }
 
@@ -155,6 +160,63 @@ public class StandUpController {
 
         }
     }
+
+    public class SelectTaskListener implements ActionListener{
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            model.loadData();
+
+            view.manageGoalsFrame.updateSelectedGoalIndex();
+
+            // ai nevoie ca sa stii unde scrii tasku (la care goal).
+            int selectedGoalIndex = view.manageGoalsFrame.getSelectedGoalIndex();
+            Goal selectedGoal = model.findGoalByIndex(selectedGoalIndex);
+
+            ArrayList<String> tasksString = model.getTasksStringOfGoal(selectedGoal);
+
+            /// make link with GUI
+            view.manageGoalsFrame.setTasksString(tasksString);
+            view.manageGoalsFrame.updateSelectTaskCombobox();
+        }
+    }
+
+    public class TaskChangedListener implements ActionListener{
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            view.manageGoalsFrame.updateSelectedGoalIndex();
+            view.manageGoalsFrame.updateSelectedTaskIndex();
+            int goalIndex = view.manageGoalsFrame.getSelectedGoalIndex();
+            int taskIndex = view.manageGoalsFrame.getSelectedTaskIndex();
+            Task task = model.getGoals().get(goalIndex).getTasks().get(taskIndex);
+            // set data in the view
+            String selectedTaskDate = task.getDescription().getStringDate();
+            String selectedTaskProgress = task.getProcentValue() + "% " + task.getProgress().getLabel();
+            String selectedTaskEstimatedHours = String.valueOf(task.getEstimatedTime().getHours());
+            String selectedTaskEstimatedMinutes = String.valueOf(task.getEstimatedTime().getMinutes());
+            String selectedTaskRealizedHours = String.valueOf(task.getRealizedTime().getHours());
+            String selectedTaskRealizedMinutes = String.valueOf(task.getRealizedTime().getMinutes());
+
+            view.manageGoalsFrame.updateTaskInfoPanel(
+                    selectedTaskDate,
+                    selectedTaskProgress,
+                    selectedTaskEstimatedHours,
+                    selectedTaskEstimatedMinutes,
+                    selectedTaskRealizedHours,
+                    selectedTaskRealizedMinutes
+            );
+        }
+    }
+
+    public class RemoveTaskListener implements ActionListener{
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            //todo
+
+
+
+        }
+    }
+
 
     public class SelectGoalListener implements ActionListener {
         @Override
