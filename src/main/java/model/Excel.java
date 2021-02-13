@@ -252,6 +252,42 @@ public class Excel {
         writeAndCloseWorkbook(workbook);
     }
 
+    public static void deleteTaskRow(Task selectedTask) {
+        ///todo : check duplicates [pe viitor]
+        Workbook workbook = createWorkbook();
+        Sheet sheet = workbook.getSheet(SHEET_NAME);
+
+        int taskIndex = findTaskRowIndex(sheet, selectedTask);
+
+//        if (taskIndex != -1){
+//            sheet.shiftRows(taskIndex, taskIndex, -1);
+//        }
+        //Row row = sheet.getRow(taskIndex);
+        //sheet.removeRow(row);
+
+        sheet.shiftRows(taskIndex, sheet.getLastRowNum(), -1);
+
+        writeAndCloseWorkbook(workbook);
+    }
+
+    private static int findTaskRowIndex(Sheet sheet, Task selectedTask) {
+        int noOfRows = getNumberOfRows(sheet);
+        for (int i = DATA_START; i < noOfRows; i++) {
+            Row row = sheet.getRow(i);
+            Cell tag = row.getCell(TAG); // read row Tag
+            if (! isGoal(tag)){ // e task
+                String searchedTaskDescription = selectedTask.getDescription().getDescription();
+                String excelTaskDescription = row.getCell(DESC).getStringCellValue();
+                if (searchedTaskDescription.equals(excelTaskDescription)){ // am gasit goalulu
+                    return i + 1; // NU STIU DC +1 DAR ASA MERGE
+                }
+            }
+        }
+
+        System.out.println("GOALU NU A FOST GASIT IN EXCEL");
+        return  -1;
+    }
+
 
     private static int findGoalRowIndex(Sheet sheet, Goal goalOfNewTask) {
         int noOfRows = getNumberOfRows(sheet);
@@ -310,4 +346,6 @@ public class Excel {
         sheet.shiftRows(7,8,1);
         writeAndCloseWorkbook(workbook);
     }
+
+
 }

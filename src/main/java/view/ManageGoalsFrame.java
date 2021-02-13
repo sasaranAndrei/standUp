@@ -72,9 +72,6 @@ public class ManageGoalsFrame {
     //****************************** LISTENERS **************************************
     /// listeners that will be established later... on other click events.
     /// for now, we just save them
-    private AddGoalListener addGoalListener;
-    private EditGoalListener editGoalListener;
-    private CreateTaskListener createTaskListener;
 
     public void addAddGoalListener(AddGoalListener addGoalListener){
         // il salvez aici pentru ca addGoal apare doar daca suntem in modul AddGoal din display panel
@@ -108,6 +105,7 @@ public class ManageGoalsFrame {
     }
 
     public void addRemoveTaskListener(RemoveTaskListener removeTaskListener) {
+        editGoalPanel.deleteTaskPanel.removeTaskButton.addActionListener(removeTaskListener);
     }
 
     //****************************** LISTENERS **************************************
@@ -172,6 +170,12 @@ public class ManageGoalsFrame {
     private int taskMinutesString;
     private int selectedTaskIndex;
 
+    public void resetDisplayPanel() { // delete task
+        frame.remove(displayPanel);
+        frame.validate();
+        frame.repaint();
+    }
+
     // updates
     public void updateSelectTaskCombobox() {
         editGoalPanel.deleteTaskPanel.selectTask // combobox
@@ -212,16 +216,15 @@ public class ManageGoalsFrame {
     public String getTaskDescriptionString() {
         return taskDescriptionString;
     }
-    public int getTaskHoursString() {
+    public int getTaskHours() {
         return taskHoursString;
     }
-    public int getTaskMinutesString() {
+    public int getTaskMinutes() {
         return taskMinutesString;
     }
     public int getSelectedTaskIndex() {
         return selectedTaskIndex;
     }
-
 
     //{{{{{{{{{{{{{data from components from this view (used in controller)}}}}}}}}}}}}
 
@@ -278,7 +281,6 @@ public class ManageGoalsFrame {
                 frame.revalidate();
                 frame.repaint();
             });
-            editGoalButton.addActionListener(editGoalListener);
             this.add(editGoalButton);
         }
     }
@@ -327,8 +329,6 @@ public class ManageGoalsFrame {
             addGoalButton = new JButton("FINISH");
             // todo -> buton calumea
             /// ACTION LISTENER
-            addGoalButton.addActionListener(addGoalListener);
-
             estimatedDatePanel.add(addGoalButton);
             return estimatedDatePanel;
         }
@@ -656,6 +656,8 @@ public class ManageGoalsFrame {
         @Override
         public void windowClosing(WindowEvent e) {
             //TODO SAVE THE WORK BEFORE CLOSING APP
+            // adica sa dau load la data din excel
+            // atunci cand revin in fereastra principala
             System.out.println("X button in GOAL MANAGER");
             System.out.println("save the work PLS");
             ViewUtils.switchFrame(frame, parentFrame);

@@ -1,13 +1,11 @@
 package controller;
 
 import model.*;
-import org.apache.poi.ss.usermodel.DataFormat;
 import view.StandUpView;
 import view.ViewUtils;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -33,6 +31,7 @@ public class StandUpController {
         view.manageGoalsFrame.addCreateTaskListener(new CreateTaskListener());
         view.manageGoalsFrame.addSelectTaskListener(new SelectTaskListener());
         view.manageGoalsFrame.addTaskChangedListener(new TaskChangedListener());
+        view.manageGoalsFrame.addRemoveTaskListener(new RemoveTaskListener());
     }
 
     public static void main(String[] args) {
@@ -140,9 +139,8 @@ public class StandUpController {
             String descriptionString = view.manageGoalsFrame.getTaskDescriptionString();
             Description description = new Description(descriptionString, date);
 
-            //todo => rename sa nu mai fie String.
-            int hours = view.manageGoalsFrame.getTaskHoursString();
-            int minutes = view.manageGoalsFrame.getTaskMinutesString();
+            int hours = view.manageGoalsFrame.getTaskHours();
+            int minutes = view.manageGoalsFrame.getTaskMinutes();
             Time estimatedTime = new Time(hours, minutes);
 
             Task task = new Task(selectedGoal, description, estimatedTime);
@@ -211,9 +209,26 @@ public class StandUpController {
         @Override
         public void actionPerformed(ActionEvent e) {
             //todo
+            // in caz ca nu mai da o data pe edit
+            model.loadData();
 
+            //TODO -> get info from view
+            //view.manageGoalsFrame.updateTaskConstructor();
+            view.manageGoalsFrame.updateSelectedGoalIndex();
+            view.manageGoalsFrame.updateSelectedTaskIndex();
 
+            // ai nevoie ca sa stii unde scrii tasku (la care goal).
+            int selectedGoalIndex = view.manageGoalsFrame.getSelectedGoalIndex();
+            Goal selectedGoal = model.findGoalByIndex(selectedGoalIndex);
+            int selectedTaskIndex =  view.manageGoalsFrame.getSelectedTaskIndex();
+            Task selectedTask = model.getGoals().get(selectedGoalIndex).getTasks().get(selectedTaskIndex);
 
+            System.out.println("Delete task " + selectedTask + " from goal : " + selectedGoal);
+
+            Excel.deleteTaskRow(selectedTask);
+
+            //todo: dupa ce dau add, sa curat descriptionu si dateul
+            view.manageGoalsFrame.resetDisplayPanel();
         }
     }
 
