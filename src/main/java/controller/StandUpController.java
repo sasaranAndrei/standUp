@@ -22,6 +22,7 @@ public class StandUpController {
         //todo methods view.addXListener => in View avem view.component.addActionListener(XListener)
         /// MAIN FRAME ActionListeners
         view.addManageGoalsListener(new ManageGoalListener());
+        view.addTaskListener(new AddTaskListener());
 
         /// MANAGE GOALS ActionListeners
         /// ADD GOAL
@@ -50,11 +51,10 @@ public class StandUpController {
 
     /// listeners for MainFrame
     public class AddTaskListener implements ActionListener {
-
         @Override
         public void actionPerformed(ActionEvent e) {
             //TODO
-
+            view.insertSelectionTaskPanel();
         }
     }
 
@@ -154,8 +154,6 @@ public class StandUpController {
             view.manageGoalsFrame.clearTaskConstructor();
             //TODO PROCESS DATE. maybe I'll do a ParserClass for all the parsing stuff in the project.
             // and insert a task row in the excel file
-
-
         }
     }
 
@@ -232,13 +230,5 @@ public class StandUpController {
         }
     }
 
-
-    public class SelectGoalListener implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            //todo
-
-        }
-    }
 
 }

@@ -2,6 +2,7 @@ package view;
 
 //todo add manually all the listeners from controller
 import controller.StandUpController.ManageGoalListener;
+import controller.StandUpController.AddTaskListener;
 
 import model.Description;
 import model.Goal;
@@ -25,6 +26,8 @@ public class StandUpView {
     private JFrame frame;
     private MainPanel mainPanel;
     private TasksPanel tasksPanel;
+
+    private InsertionTaskPanel insertionTaskPanel;
 
     public StandUpView() {
         // frames stuff
@@ -58,6 +61,14 @@ public class StandUpView {
     public void addManageGoalsListener(ManageGoalListener manageGoalListener) {
         // Manage Goals BUTTON
         mainPanel.manageGoalsButton.addActionListener(manageGoalListener);
+    }
+
+    public void addTaskListener(AddTaskListener addTaskListener){
+        tasksPanel.addTaskButton.addActionListener(addTaskListener);
+    }
+
+    public void insertSelectionTaskPanel() {
+        //tasksPanel.add
     }
 
     // JPanel for the main (header part of the app)
@@ -100,9 +111,6 @@ public class StandUpView {
     }
 
     private class TasksPanel extends JPanel{
-        // model
-        private ArrayList<Task> tasks;
-
         // view
         private JPanel descriptionPanel; // the first row (indicators)
         private JPanel taskRowsPanel; // matrix of tasks
@@ -114,9 +122,6 @@ public class StandUpView {
         private JLabel progressLabel;
 
         public TasksPanel() {
-            // model
-            tasks = new ArrayList<>();
-
             // view
             this.setSize(ViewUtils.TASK_PANEL_DIMENSION);
 
@@ -191,7 +196,6 @@ public class StandUpView {
             ViewUtils.resizeWindow(frame);
 
             TaskLinePanel taskLinePanel = new TaskLinePanel();
-            tasks.add(taskLinePanel.task); // model
             taskRowsPanel.add(taskLinePanel);
             validate();
         }
@@ -276,6 +280,12 @@ public class StandUpView {
             this.add(saveProgressButton);
         }
     }
+
+    private class InsertionTaskPanel extends JPanel {
+        //todo 2 comboBoxuri si un buton de validare
+        // care odata apasat dispare InsertionTaskPanelu
+    }
+
 
     // WindowsListener for saving the data before closing app.
     class MyWindowListener implements WindowListener {
