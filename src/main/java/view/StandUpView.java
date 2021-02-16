@@ -3,6 +3,8 @@ package view;
 //todo add manually all the listeners from controller
 import controller.StandUpController.ManageGoalListener;
 import controller.StandUpController.AddTaskListener;
+import controller.StandUpController.AddTaskToActiveTasks;
+import controller.StandUpController.TaskChangedComboboxListener;
 
 import model.Description;
 import model.Goal;
@@ -10,9 +12,8 @@ import model.Task;
 import model.Time;
 
 import javax.swing.*;
+import javax.swing.text.View;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.ArrayList;
@@ -56,6 +57,8 @@ public class StandUpView {
         frame.add(tasksPanel, BorderLayout.CENTER);
 
         frame.validate();
+
+        insertionTaskPanel = new InsertionTaskPanel();
     }
 
     public void addManageGoalsListener(ManageGoalListener manageGoalListener) {
@@ -67,9 +70,82 @@ public class StandUpView {
         tasksPanel.addTaskButton.addActionListener(addTaskListener);
     }
 
-    public void insertSelectionTaskPanel() {
-        //tasksPanel.add
+    public void addTaskToActiveTasks(AddTaskToActiveTasks addTaskToActiveTasks) {
+        insertionTaskPanel.addTaskToActiveTasks.addActionListener(addTaskToActiveTasks);
     }
+
+    public void addTaskChangedComboboxListener (TaskChangedComboboxListener taskChangedComboboxListener){
+        insertionTaskPanel.goalComboBox.addActionListener(taskChangedComboboxListener);
+    }
+
+    public void insertSelectionTaskPanel() {
+        ViewUtils.resizeWindowPlus(frame);
+        tasksPanel.taskRowsPanel.add(insertionTaskPanel);
+    }
+
+    private ArrayList<String> goalsString;
+    private ArrayList<String> tasksString;
+    // and their setters
+
+    public void updateSelectGoalCombobox() {
+        insertionTaskPanel.goalComboBox
+                .setModel(new DefaultComboBoxModel<>(goalsString.toArray(new String[0])));
+    }
+
+    public void setGoalsString(ArrayList<String> goalsString) {
+        this.goalsString = goalsString;
+    }
+
+    public void setTasksString(ArrayList<String> tasksString) {
+        this.tasksString = tasksString;
+    }
+
+    // goal
+    private int selectedGoalIndex;
+    public int getSelectedGoalIndex() {
+        return selectedGoalIndex;
+    }
+    public void updateSelectedGoalIndex() {
+        selectedGoalIndex = insertionTaskPanel.goalComboBox.getSelectedIndex();
+    }
+
+    // task
+    private int selectedTaskIndex;
+    public int getSelectedTaskIndex() {
+        return selectedTaskIndex;
+    }
+    public void updateSelectedTaskIndex() {
+        selectedTaskIndex = insertionTaskPanel.taskComboBox.getSelectedIndex();
+    }
+
+    public void updateSelectTaskCombobox() {
+        insertionTaskPanel.taskComboBox
+                .setModel(new DefaultComboBoxModel<>(tasksString.toArray(new String[0])));
+    }
+
+    public void hideInsertionTaskPanel (){
+        tasksPanel.taskRowsPanel.remove(insertionTaskPanel);
+        ViewUtils.resizeWindowMinus(frame);
+        frame.validate();
+        frame.repaint();
+    }
+
+    public void insertTaskRowPanel (String selectedTaskDescription,
+                                    String selectedTaskRealizedTime,
+                                    String selectedTaskProgress){
+        ViewUtils.resizeWindowPlus(frame);
+        TaskLinePanel taskLinePanel = new TaskLinePanel(selectedTaskDescription, selectedTaskRealizedTime, selectedTaskProgress);
+        tasksPanel.taskRowsPanel.add(taskLinePanel);
+        frame.validate();
+        frame.repaint();
+    }
+
+
+      /*
+
+
+         */
+
 
     // JPanel for the main (header part of the app)
     private class MainPanel extends JPanel {
@@ -143,14 +219,15 @@ public class StandUpView {
             activeTasksLabel.setForeground(ViewUtils.LABEL_COLOR);
             descriptionPanel.add(activeTasksLabel);
 
-            descriptionPanel.add(new JLabel("  "));
+            descriptionPanel.add(new JLabel(" "));
             /// add task button
             addTaskButton = new JButton("ADD TASK");
             addTaskButton.setFont(new Font("Bodoni MT Black", Font.BOLD, ViewUtils.COMPONENT_TEXT_SIZE));
             addTaskButton.setForeground(ViewUtils.BUTTON_COLOR);
             addTaskButton.setOpaque(true);
             addTaskButton.setBackground(ViewUtils.BUTTON_BACKGROUND_COLOR);
-            addTaskButton.addActionListener(e -> addTaskLinePanel()); // !!!!!!!!
+
+            //addTaskButton.addActionListener(e -> addTaskLinePanel()); // !!!!!!!!
             descriptionPanel.add(addTaskButton);
 
             descriptionPanel.add(new JLabel("   "));
@@ -193,11 +270,16 @@ public class StandUpView {
         private void addTaskLinePanel (){
             System.out.println("ADD TASK");
             // view
-            ViewUtils.resizeWindow(frame);
+            ViewUtils.resizeWindowPlus(frame);
 
             TaskLinePanel taskLinePanel = new TaskLinePanel();
             taskRowsPanel.add(taskLinePanel);
             validate();
+        }
+
+        private void insertSelectTask (){
+
+
         }
 
 
@@ -232,14 +314,29 @@ public class StandUpView {
 
         }
 
-        public TaskLinePanel(Task newTask) {
-            task = newTask;
+        public TaskLinePanel(String selectedTaskDescription, String selectedTaskRealizedTime, String selectedTaskProgress) {
+
+            this.setLayout(new FlowLayout(FlowLayout.LEFT));
+
+            taskDescriptionLabel = new JLabel(selectedTaskDescription, SwingConstants.LEFT);
+            taskDescriptionLabel.setFont(new Font("Bodoni MT Black", Font.BOLD, ViewUtils.COMPONENT_TEXT_SIZE));
+            taskDescriptionLabel.setForeground(ViewUtils.LABEL_COLOR);
+            this.add(taskDescriptionLabel);
+
+            taskWorkButton = new JButton("WORK");
+            taskWorkButton.setFont(new Font("Bodoni MT Black", Font.BOLD, ViewUtils.COMPONENT_TEXT_SIZE));
+            taskWorkButton.setForeground(ViewUtils.BUTTON_COLOR);
+            taskWorkButton.setOpaque(true);
+            taskWorkButton.setBackground(ViewUtils.BUTTON_BACKGROUND_COLOR);
+            taskWorkButton.setPreferredSize(ViewUtils.WORK_BUTTON_SIZE);
+            this.add(taskWorkButton);
 
         }
 
+
         private void initComponents (){
             ///TODO : put 'spaces' between elements of panel, for keeping an alignment
-            taskDescriptionLabel = new JLabel(task.getTaskDescription(), SwingConstants.LEFT);
+            //taskDescriptionLabel = new JLabel(task.getTaskDescription(), SwingConstants.LEFT);
             taskDescriptionLabel.setFont(new Font("Bodoni MT Black", Font.BOLD, ViewUtils.COMPONENT_TEXT_SIZE));
             taskDescriptionLabel.setForeground(ViewUtils.LABEL_COLOR);
             this.add(taskDescriptionLabel);
@@ -284,6 +381,40 @@ public class StandUpView {
     private class InsertionTaskPanel extends JPanel {
         //todo 2 comboBoxuri si un buton de validare
         // care odata apasat dispare InsertionTaskPanelu
+
+        private JComboBox<String> goalComboBox;
+        private JComboBox<String> taskComboBox;
+        private JButton addTaskToActiveTasks;
+
+        public InsertionTaskPanel() {
+            this.setLayout(new FlowLayout(FlowLayout.LEFT));
+
+            // goals
+            goalComboBox = new JComboBox<>();
+            goalComboBox.setPrototypeDisplayValue("123456789012345678");
+            if (goalsString != null){ // initialized when Edit is clicked
+                goalComboBox.setModel(new DefaultComboBoxModel<>(goalsString.toArray(new String[0])));
+            }
+            //nu cred ca are nevoie de actionListener pentru ca odata ce da pe Add/Rmv Task
+            // se ia infromatia despre Goalul selectatat.
+            this.add(goalComboBox);
+
+            // tasks
+            taskComboBox = new JComboBox<>();
+            taskComboBox.setPrototypeDisplayValue("123456789012345678");
+            this.add(taskComboBox);
+
+            addTaskToActiveTasks = new JButton("WORK");
+            addTaskToActiveTasks.setFont(new Font("Bodoni MT Black", Font.BOLD, ViewUtils.COMPONENT_TEXT_SIZE));
+            addTaskToActiveTasks.setForeground(ViewUtils.BUTTON_COLOR);
+            addTaskToActiveTasks.setOpaque(true);
+            addTaskToActiveTasks.setBackground(ViewUtils.BUTTON_BACKGROUND_COLOR);
+            this.add(addTaskToActiveTasks);
+
+            validate();
+            repaint();
+
+        }
     }
 
 

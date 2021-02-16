@@ -622,7 +622,7 @@ public class ManageGoalsFrame {
 
                 // button
                 removeTaskButton = new JButton("REMOVE TASK");
-                removeTaskButton.setFont(new Font("Bodoni MT Black", Font.BOLD, ViewUtils.BIGGER_COMPONENT_TEXT_SIZE));
+                removeTaskButton.setFont(new Font("Bodoni MT Black", Font.BOLD, ViewUtils.COMPONENT_TEXT_SIZE));
                 removeTaskButton.setForeground(ViewUtils.BUTTON_COLOR);
                 removeTaskButton.setOpaque(true);
                 removeTaskButton.setBackground(ViewUtils.BUTTON_BACKGROUND_COLOR);

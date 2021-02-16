@@ -69,8 +69,22 @@ public class Task extends AbstractGoal{
                 + " /./ realizedWorkTime : " + realizedTime + " /./ progress " + progress + "\n";
     }
 
-    public String getTaskDescription() {
-        ///TODO : primele 20 de caracatere din description sa apara.
-        return "12345678901234567890";
+    public String getFixedDescription() {
+        String description = getDescription().getDescription();
+        int descriptionLength = description.length();
+
+        int maxLength = 21;
+
+        String fixedDescription;
+        if (descriptionLength > maxLength){
+            fixedDescription = description.substring(0,maxLength);
+        }
+        else {
+            fixedDescription = description;
+            for (int l = descriptionLength; l < maxLength; l++){
+                fixedDescription += " ";
+            }
+        }
+        return fixedDescription;
     }
 }

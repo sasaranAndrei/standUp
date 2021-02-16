@@ -43,8 +43,14 @@ public class ViewUtils {
         nextFrame.setVisible(true);
     }
 
-    public static void resizeWindow (JFrame frame){
+    public static void resizeWindowPlus(JFrame frame){
         FRAME_DIMENSION = new Dimension(FRAME_DIMENSION.width, FRAME_DIMENSION.height + FRAME_INCREASE_DIMENSION);
+        frame.setSize(FRAME_DIMENSION);
+        frame.validate();
+    }
+
+    public static void resizeWindowMinus(JFrame frame){
+        FRAME_DIMENSION = new Dimension(FRAME_DIMENSION.width, FRAME_DIMENSION.height - FRAME_INCREASE_DIMENSION);
         frame.setSize(FRAME_DIMENSION);
         frame.validate();
     }

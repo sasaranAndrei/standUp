@@ -23,6 +23,8 @@ public class StandUpController {
         /// MAIN FRAME ActionListeners
         view.addManageGoalsListener(new ManageGoalListener());
         view.addTaskListener(new AddTaskListener());
+        view.addTaskChangedComboboxListener(new TaskChangedComboboxListener());
+        view.addTaskToActiveTasks(new AddTaskToActiveTasks());
 
         /// MANAGE GOALS ActionListeners
         /// ADD GOAL
@@ -54,7 +56,57 @@ public class StandUpController {
         @Override
         public void actionPerformed(ActionEvent e) {
             //TODO
+            model.loadData();
+
+            ArrayList<String> goalsString = model.getGoalsString();
+            /// make link with GUI
+            view.setGoalsString(goalsString);
+            view.updateSelectGoalCombobox();
+
             view.insertSelectionTaskPanel();
+        }
+    }
+
+    public class TaskChangedComboboxListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            view.updateSelectedGoalIndex();
+
+            int selectedGoalIndex = view.getSelectedGoalIndex();
+            Goal selectedGoal = model.findGoalByIndex(selectedGoalIndex);
+
+            System.out.println("Selected goal index : " + selectedGoalIndex);
+
+            ArrayList<String> tasksString = model.getTasksStringOfGoal(selectedGoal);
+            /// make link with GUI
+            view.setTasksString(tasksString);
+            view.updateSelectTaskCombobox();
+        }
+    }
+
+    public class AddTaskToActiveTasks implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            view.updateSelectedGoalIndex();
+            view.updateSelectedTaskIndex();
+            int selectedGoalIndex = view.getSelectedGoalIndex();
+            int selectedTaskIndex = view.getSelectedTaskIndex();
+
+            Task task = model.getGoals().get(selectedGoalIndex).getTasks().get(selectedTaskIndex);
+            String selectedTaskDescription = task.getFixedDescription();
+            String selectedTaskProgress = task.getProcentValue() + "% " + task.getProgress().getLabel();
+            String selectedTaskRealizedTime = task.toString();
+
+            view.hideInsertionTaskPanel();
+
+            view.insertTaskRowPanel(
+                    selectedTaskDescription,
+                    selectedTaskRealizedTime,
+                    selectedTaskProgress
+            );
+
         }
     }
 
