@@ -29,4 +29,12 @@ public class Time {
     public int getMinutes() {
         return minutes;
     }
+
+    public void incrementMinute (){
+        if (minutes == 59) {
+            hours++;
+            minutes = 0;
+        }
+        else minutes++;
+    }
 }

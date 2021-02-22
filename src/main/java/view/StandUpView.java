@@ -1,10 +1,13 @@
 package view;
 
 //todo add manually all the listeners from controller
+import controller.StandUpController;
 import controller.StandUpController.ManageGoalListener;
 import controller.StandUpController.AddTaskListener;
 import controller.StandUpController.AddTaskToActiveTasks;
 import controller.StandUpController.TaskChangedComboboxListener;
+import controller.StandUpController.WorkListener;
+import controller.StandUpController.IncrementTimeListener;
 
 import model.Description;
 import model.Goal;
@@ -31,6 +34,8 @@ public class StandUpView {
     private InsertionTaskPanel insertionTaskPanel;
 
     private ArrayList<JButton> workButtons;
+
+    private Timer globalTimer;
 
     public StandUpView() {
         // frames stuff
@@ -62,6 +67,11 @@ public class StandUpView {
 
         insertionTaskPanel = new InsertionTaskPanel();
         workButtons = new ArrayList<>();
+    }
+
+    public void addGlobalTimerListener(IncrementTimeListener incrementTimeListener){
+        globalTimer = new Timer(1000, incrementTimeListener);
+        // sa se incrementeze o data la fiecare minut
     }
 
     public void addManageGoalsListener(ManageGoalListener manageGoalListener) {
@@ -147,11 +157,34 @@ public class StandUpView {
         for (JButton workButton : workButtons){
             workButton.setEnabled(true);
         }
-
     }
 
     public void makeOtherButtonsUnclickable(Object source) {
+        JButton sourceButton = null;
+        if (source instanceof JButton) sourceButton = (JButton) source;
 
+        for (JButton workButton : workButtons) {
+            if (workButton != sourceButton) {
+                workButton.setEnabled(false);
+            }
+        }
+    }
+
+    WorkListener workGlobalListener;
+    public void insertWorkListener(WorkListener workListener) {
+        workGlobalListener = workListener;
+    }
+
+    public void updateGlobalTime(String timeString) {
+        mainPanel.globalTimeValueLabel.setText(timeString);
+    }
+
+    public void resumeGlobalTimer() {
+        globalTimer.start();
+    }
+
+    public void pauseGlobalTimer() {
+        globalTimer.stop();
     }
 
 
@@ -313,6 +346,8 @@ public class StandUpView {
             taskWorkButton.setOpaque(true);
             taskWorkButton.setBackground(ViewUtils.BUTTON_BACKGROUND_COLOR);
             taskWorkButton.setPreferredSize(ViewUtils.WORK_BUTTON_SIZE);
+            //////////// MOUSE LISTENER ???
+            taskWorkButton.addActionListener(workGlobalListener);
             this.add(taskWorkButton);
             // make the link
             workButtons.add(taskWorkButton);

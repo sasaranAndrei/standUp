@@ -1,8 +1,31 @@
 package controller;
 
+import javax.swing.Timer;
+import controller.StandUpController.IncrementTimeListener;
+
 public class TimerTask extends java.util.TimerTask {
+
+    private String description;
+
+    private Timer timer;
+
+    public TimerTask (String description){
+        this.description = description;
+
+    }
+
     @Override
     public void run() {
-        System.out.println("my timerTask");
+
+        //System.out.println("Timer " + description + " : " + hours + "|" + minutes);
+    }
+
+    public void resumeTimer() {
+        // sa incrementeze dupa fiecare minut
+        //timer.schedule(this, 0, 60000);
+    }
+
+    public void pauseTimer() {
+
     }
 }

@@ -14,7 +14,8 @@ public class StandUpController {
     private StandUpModel model;
     private StandUpView  view;
 
-    private boolean currentlyWorking = false;
+    private boolean currentlyWorking;
+    //private TimerTask globalTimer;
 
     public StandUpController(StandUpModel theModel, StandUpView theView) {
         model = theModel;
@@ -27,6 +28,8 @@ public class StandUpController {
         view.addTaskListener(new AddTaskListener());
         view.addTaskChangedComboboxListener(new TaskChangedComboboxListener());
         view.addTaskToActiveTasks(new AddTaskToActiveTasks());
+        view.insertWorkListener(new WorkListener());
+        view.addGlobalTimerListener(new IncrementTimeListener());
 
         /// MANAGE GOALS ActionListeners
         /// ADD GOAL
@@ -37,6 +40,10 @@ public class StandUpController {
         view.manageGoalsFrame.addSelectTaskListener(new SelectTaskListener());
         view.manageGoalsFrame.addTaskChangedListener(new TaskChangedListener());
         view.manageGoalsFrame.addRemoveTaskListener(new RemoveTaskListener());
+
+        // timers
+        //globalTimer = new TimerTask("global");
+        currentlyWorking = false;
     }
 
     public static void main(String[] args) {
@@ -111,6 +118,8 @@ public class StandUpController {
                     selectedTaskProgressValue
             );
 
+            //todo create a timer for this task
+
         }
     }
 
@@ -123,11 +132,38 @@ public class StandUpController {
             if (itsPressed) => pause
             else work
              */
+            //System.out.println("work button este ???");
 
-            if (currentlyWorking) view.makeWorkButtonsClickable();
-            else view.makeOtherButtonsUnclickable(e.getSource());
+            if (currentlyWorking) {
+                view.makeWorkButtonsClickable();
+                // stop timer
+                //globalTimer.pauseTimer();
+                view.pauseGlobalTimer();
+            }
+            else {
+                view.makeOtherButtonsUnclickable(e.getSource());
+                // start timer
+                view.resumeGlobalTimer();
+                //globalTimer.resumeTimer();
+            }
 
             currentlyWorking = !currentlyWorking;
+        }
+    }
+
+    public class IncrementTimeListener implements ActionListener {
+        private Time time;
+
+        public IncrementTimeListener() {
+            time = new Time(0,0);
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            System.out.println("global time : " + time);
+            time.incrementMinute();
+            // display global time on view
+            view.updateGlobalTime(time.toString());
         }
     }
 
