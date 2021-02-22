@@ -30,6 +30,8 @@ public class StandUpView {
 
     private InsertionTaskPanel insertionTaskPanel;
 
+    private ArrayList<JButton> workButtons;
+
     public StandUpView() {
         // frames stuff
         frame = new JFrame();
@@ -59,6 +61,7 @@ public class StandUpView {
         frame.validate();
 
         insertionTaskPanel = new InsertionTaskPanel();
+        workButtons = new ArrayList<>();
     }
 
     public void addManageGoalsListener(ManageGoalListener manageGoalListener) {
@@ -130,18 +133,29 @@ public class StandUpView {
         frame.repaint();
     }
 
-    public void insertTaskRowPanel (String selectedTaskDescription,
-                                    String selectedTaskRealizedTime,
-                                    String selectedTaskProgress){
+    public void insertTaskRowPanel(String selectedTaskDescription,
+                                   String selectedTaskRealizedTime,
+                                   String selectedTaskProgressValue){
         ViewUtils.resizeWindowPlus(frame);
-        TaskLinePanel taskLinePanel = new TaskLinePanel(selectedTaskDescription, selectedTaskRealizedTime, selectedTaskProgress);
+        TaskLinePanel taskLinePanel = new TaskLinePanel(selectedTaskDescription, selectedTaskRealizedTime, selectedTaskProgressValue);
         tasksPanel.taskRowsPanel.add(taskLinePanel);
         frame.validate();
         frame.repaint();
     }
 
+    public void makeWorkButtonsClickable() {
+        for (JButton workButton : workButtons){
+            workButton.setEnabled(true);
+        }
 
-      /*
+    }
+
+    public void makeOtherButtonsUnclickable(Object source) {
+
+    }
+
+
+    /*
 
 
          */
@@ -267,32 +281,13 @@ public class StandUpView {
             validate();
         }
 
-        private void addTaskLinePanel (){
-            System.out.println("ADD TASK");
-            // view
-            ViewUtils.resizeWindowPlus(frame);
 
-            TaskLinePanel taskLinePanel = new TaskLinePanel();
-            taskRowsPanel.add(taskLinePanel);
-            validate();
-        }
-
-        private void insertSelectTask (){
-
-
-        }
 
 
     }
 
     private class TaskLinePanel extends JPanel {
-        // model
-        private Task task;
-        private Description testDescription = new Description("goalDesc", new Date());
-        private Goal testGoal = new Goal(testDescription);
-        private Time testEstimatedTime = new Time(2,30);
 
-        private Time currentWorkTime;
         // view
         private JLabel taskDescriptionLabel;
         private JButton taskWorkButton;
@@ -300,25 +295,14 @@ public class StandUpView {
         private JTextField taskProgress;
         private JButton saveProgressButton;
 
-        public TaskLinePanel (){
-            // model
-            task = new Task(testGoal, testDescription, testEstimatedTime);
-            currentWorkTime = new Time(0,0);
-
-            // view
-            this.setLayout(new FlowLayout(FlowLayout.LEFT));
-            initComponents();
-
-            this.setBackground(ViewUtils.MAIN_PANEL_COLOR);
-            this.validate();
-
-        }
-
-        public TaskLinePanel(String selectedTaskDescription, String selectedTaskRealizedTime, String selectedTaskProgress) {
+        public TaskLinePanel(String selectedTaskDescription, String selectedTaskRealizedTime, String selectedTaskProgressValue) {
 
             this.setLayout(new FlowLayout(FlowLayout.LEFT));
 
             taskDescriptionLabel = new JLabel(selectedTaskDescription, SwingConstants.LEFT);
+            taskDescriptionLabel.setMinimumSize(ViewUtils.TEXTLINE_LABEL_DIMENSION);
+            taskDescriptionLabel.setPreferredSize(ViewUtils.TEXTLINE_LABEL_DIMENSION);
+            taskDescriptionLabel.setMaximumSize(ViewUtils.TEXTLINE_LABEL_DIMENSION);
             taskDescriptionLabel.setFont(new Font("Bodoni MT Black", Font.BOLD, ViewUtils.COMPONENT_TEXT_SIZE));
             taskDescriptionLabel.setForeground(ViewUtils.LABEL_COLOR);
             this.add(taskDescriptionLabel);
@@ -330,34 +314,20 @@ public class StandUpView {
             taskWorkButton.setBackground(ViewUtils.BUTTON_BACKGROUND_COLOR);
             taskWorkButton.setPreferredSize(ViewUtils.WORK_BUTTON_SIZE);
             this.add(taskWorkButton);
+            // make the link
+            workButtons.add(taskWorkButton);
 
-        }
-
-
-        private void initComponents (){
-            ///TODO : put 'spaces' between elements of panel, for keeping an alignment
-            //taskDescriptionLabel = new JLabel(task.getTaskDescription(), SwingConstants.LEFT);
-            taskDescriptionLabel.setFont(new Font("Bodoni MT Black", Font.BOLD, ViewUtils.COMPONENT_TEXT_SIZE));
-            taskDescriptionLabel.setForeground(ViewUtils.LABEL_COLOR);
-            this.add(taskDescriptionLabel);
-
-            taskWorkButton = new JButton("WORK");
-            taskWorkButton.setFont(new Font("Bodoni MT Black", Font.BOLD, ViewUtils.COMPONENT_TEXT_SIZE));
-            taskWorkButton.setForeground(ViewUtils.BUTTON_COLOR);
-            taskWorkButton.setOpaque(true);
-            taskWorkButton.setBackground(ViewUtils.BUTTON_BACKGROUND_COLOR);
-            taskWorkButton.setPreferredSize(ViewUtils.WORK_BUTTON_SIZE);
-            this.add(taskWorkButton);
-
-            taskTime = new JLabel(currentWorkTime.toString());
+            taskTime = new JLabel(selectedTaskRealizedTime, SwingConstants.LEFT);
+            taskTime.setMinimumSize(ViewUtils.TIME_LABEL_DIMENSION);
+            taskTime.setPreferredSize(ViewUtils.TIME_LABEL_DIMENSION);
+            taskTime.setMaximumSize(ViewUtils.TIME_LABEL_DIMENSION);
             taskTime.setFont(new Font("Bodoni MT Black", Font.BOLD, ViewUtils.COMPONENT_TEXT_SIZE));
             taskTime.setForeground(ViewUtils.LABEL_COLOR);
             this.add(taskTime);
 
             taskProgress = new JTextField(3);
-            taskProgress.setText(task.getProcentValue() + "%");
+            taskProgress.setText(selectedTaskProgressValue + "%");
             this.add(taskProgress);
-
 
             ImageIcon saveIcon = new ImageIcon("resources/saveIcon.png");
             Image image = saveIcon.getImage();
@@ -375,7 +345,13 @@ public class StandUpView {
 
 //            saveProgressButton.setIcon();
             this.add(saveProgressButton);
+
+
+
         }
+
+
+
     }
 
     private class InsertionTaskPanel extends JPanel {

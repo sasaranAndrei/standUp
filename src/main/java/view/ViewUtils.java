@@ -13,6 +13,12 @@ public class ViewUtils {
     static final int RIGHT_BOTTOM_CORNER_Y = 200;
     static final int COMPONENT_TEXT_SIZE = 12;
     static final int BIGGER_COMPONENT_TEXT_SIZE = 16;
+    static final int TEXTLINE_LABEL_WIDTH = 22;
+    static final int TEXTLINE_LABEL_HEIGHT = 10;
+    static final Dimension TEXTLINE_LABEL_DIMENSION = new Dimension(157,10);
+    static final Dimension TIME_LABEL_DIMENSION = new Dimension(35,10);
+
+
     //static final int COMPONENT_TEXT_SIZE_SMALL = 10;
     static final int SPACE_BETWEEN_COMPONENTS = 2;
     // components color constants

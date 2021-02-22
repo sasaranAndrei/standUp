@@ -14,6 +14,8 @@ public class StandUpController {
     private StandUpModel model;
     private StandUpView  view;
 
+    private boolean currentlyWorking = false;
+
     public StandUpController(StandUpModel theModel, StandUpView theView) {
         model = theModel;
         view = theView;
@@ -82,6 +84,7 @@ public class StandUpController {
             /// make link with GUI
             view.setTasksString(tasksString);
             view.updateSelectTaskCombobox();
+            //todo sa nu poti sa adaugi taskuri deja adaugate
         }
     }
 
@@ -96,15 +99,16 @@ public class StandUpController {
 
             Task task = model.getGoals().get(selectedGoalIndex).getTasks().get(selectedTaskIndex);
             String selectedTaskDescription = task.getFixedDescription();
-            String selectedTaskProgress = task.getProcentValue() + "% " + task.getProgress().getLabel();
-            String selectedTaskRealizedTime = task.toString();
+            System.out.println(selectedTaskDescription + "|");
+            String selectedTaskProgressValue = String.valueOf(task.getProcentValue()); // + "% " + task.getProgress().getLabel();
+            String selectedTaskRealizedTime = task.getRealizedTime().toString();
 
             view.hideInsertionTaskPanel();
 
             view.insertTaskRowPanel(
                     selectedTaskDescription,
                     selectedTaskRealizedTime,
-                    selectedTaskProgress
+                    selectedTaskProgressValue
             );
 
         }
@@ -115,6 +119,15 @@ public class StandUpController {
         @Override
         public void actionPerformed(ActionEvent e) {
             //TODO
+            /*
+            if (itsPressed) => pause
+            else work
+             */
+
+            if (currentlyWorking) view.makeWorkButtonsClickable();
+            else view.makeOtherButtonsUnclickable(e.getSource());
+
+            currentlyWorking = !currentlyWorking;
         }
     }
 

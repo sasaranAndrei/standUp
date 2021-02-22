@@ -70,6 +70,7 @@ public class Task extends AbstractGoal{
     }
 
     public String getFixedDescription() {
+        // exact 21 de carcatere
         String description = getDescription().getDescription();
         int descriptionLength = description.length();
 
