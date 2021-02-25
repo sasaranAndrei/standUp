@@ -7,20 +7,15 @@ import controller.StandUpController.AddTaskListener;
 import controller.StandUpController.AddTaskToActiveTasks;
 import controller.StandUpController.TaskChangedComboboxListener;
 import controller.StandUpController.WorkListener;
-import controller.StandUpController.IncrementTimeListener;
-
-import model.Description;
-import model.Goal;
-import model.Task;
-import model.Time;
+import controller.StandUpController.GlobalTimeListener;
+import controller.StandUpController.WorkTimeListener;
+import controller.StandUpController.SaveListener;
 
 import javax.swing.*;
-import javax.swing.text.View;
 import java.awt.*;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.ArrayList;
-import java.util.Date;
 
 public class StandUpView {
     // child frame
@@ -34,8 +29,10 @@ public class StandUpView {
     private InsertionTaskPanel insertionTaskPanel;
 
     private ArrayList<JButton> workButtons;
+    private ArrayList<JLabel> workTimeLabels;
 
     private Timer globalTimer;
+    private ArrayList<Timer> workTimers;
 
     public StandUpView() {
         // frames stuff
@@ -67,11 +64,13 @@ public class StandUpView {
 
         insertionTaskPanel = new InsertionTaskPanel();
         workButtons = new ArrayList<>();
+        workTimers = new ArrayList<>();
+        workTimeLabels = new ArrayList<>();
     }
 
-    public void addGlobalTimerListener(IncrementTimeListener incrementTimeListener){
+    public void addGlobalTimerListener(GlobalTimeListener incrementTimeListener){
         globalTimer = new Timer(1000, incrementTimeListener);
-        // sa se incrementeze o data la fiecare minut
+        //todo sa se incrementeze o data la fiecare minut
     }
 
     public void addManageGoalsListener(ManageGoalListener manageGoalListener) {
@@ -174,6 +173,19 @@ public class StandUpView {
     public void insertWorkListener(WorkListener workListener) {
         workGlobalListener = workListener;
     }
+    //ArrayList<WorkTimeListener> workTimeListeners = new ArrayList<>();
+    WorkTimeListener workTimeListener;
+    public void insertWorkTimeListener(WorkTimeListener wTimeListener) {
+        workTimeListener = wTimeListener;
+    }
+    StandUpController.SaveListener saveListener;
+    public void insertSaveListener(SaveListener sListener) {
+        saveListener = sListener;
+    }
+
+
+
+
 
     public void updateGlobalTime(String timeString) {
         mainPanel.globalTimeValueLabel.setText(timeString);
@@ -186,6 +198,38 @@ public class StandUpView {
     public void pauseGlobalTimer() {
         globalTimer.stop();
     }
+
+    public void resumeWorkTimer (Object source){
+        //TODO: verifica al catelea buton s o apasat ca sa stii ce label sa modifici
+        for (JButton workButton : workButtons){
+            if (workButton == source){
+                int index = workButtons.indexOf(workButton);
+                workTimers.get(index).start();
+            }
+        }
+    }
+
+    public void pauseWorkTimer (Object source){
+        //TODO: verifica al catelea buton s o apasat ca sa stii ce label sa modifici
+        for (JButton workButton : workButtons){
+            if (workButton == source){
+                int index = workButtons.indexOf(workButton);
+                workTimers.get(index).stop();
+            }
+        }
+    }
+
+    public void updateWorkTime(int index, String timeString) {
+        workTimeLabels.get(index).setText(timeString);
+    }
+
+
+    private static int NO_OF_ACTIVE_TASKS = 0;
+
+
+
+
+
 
 
     /*
@@ -320,7 +364,6 @@ public class StandUpView {
     }
 
     private class TaskLinePanel extends JPanel {
-
         // view
         private JLabel taskDescriptionLabel;
         private JButton taskWorkButton;
@@ -347,6 +390,7 @@ public class StandUpView {
             taskWorkButton.setBackground(ViewUtils.BUTTON_BACKGROUND_COLOR);
             taskWorkButton.setPreferredSize(ViewUtils.WORK_BUTTON_SIZE);
             //////////// MOUSE LISTENER ???
+            addTimerActionListener();
             taskWorkButton.addActionListener(workGlobalListener);
             this.add(taskWorkButton);
             // make the link
@@ -359,6 +403,7 @@ public class StandUpView {
             taskTime.setFont(new Font("Bodoni MT Black", Font.BOLD, ViewUtils.COMPONENT_TEXT_SIZE));
             taskTime.setForeground(ViewUtils.LABEL_COLOR);
             this.add(taskTime);
+            workTimeLabels.add(taskTime);
 
             taskProgress = new JTextField(3);
             taskProgress.setText(selectedTaskProgressValue + "%");
@@ -372,22 +417,31 @@ public class StandUpView {
             saveProgressButton.setFont(new Font("Bodoni MT Black", Font.BOLD, ViewUtils.COMPONENT_TEXT_SIZE));
             saveProgressButton.setForeground(ViewUtils.BUTTON_COLOR);
             saveProgressButton.setOpaque(true);
-
-//            saveProgressButton.setSize(100,100);
             saveProgressButton.setBackground(ViewUtils.BUTTON_BACKGROUND_COLOR);
-
-
-
-//            saveProgressButton.setIcon();
+            saveProgressButton.addActionListener(saveListener);
             this.add(saveProgressButton);
-
-
 
         }
 
-
-
+        public void addTimerActionListener() {
+            if (workTimeListener == null) System.out.println("HOPA");
+            else {
+                try {
+                    WorkTimeListener newWorkTimeListener = (WorkTimeListener) workTimeListener.clone(); // copy
+                    newWorkTimeListener.setIndex(NO_OF_ACTIVE_TASKS);
+                    newWorkTimeListener.makeTimeZero();
+                    Timer timer = new Timer(1000, newWorkTimeListener);
+                    workTimers.add(timer);
+                    NO_OF_ACTIVE_TASKS++;
+                }
+                catch (Exception e){
+                    System.out.println("HOPA");
+                }
+            }
+        }
     }
+
+
 
     private class InsertionTaskPanel extends JPanel {
         //todo 2 comboBoxuri si un buton de validare

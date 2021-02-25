@@ -29,7 +29,9 @@ public class StandUpController {
         view.addTaskChangedComboboxListener(new TaskChangedComboboxListener());
         view.addTaskToActiveTasks(new AddTaskToActiveTasks());
         view.insertWorkListener(new WorkListener());
-        view.addGlobalTimerListener(new IncrementTimeListener());
+        view.addGlobalTimerListener(new GlobalTimeListener());
+        view.insertWorkTimeListener(new WorkTimeListener());
+        view.insertSaveListener(new SaveListener());
 
         /// MANAGE GOALS ActionListeners
         /// ADD GOAL
@@ -51,6 +53,7 @@ public class StandUpController {
         StandUpView  view   = new StandUpView();
         StandUpController controller = new StandUpController(model, view);
     }
+
 
     /// listener for ManageGoals Button
     public class ManageGoalListener implements ActionListener {
@@ -119,51 +122,87 @@ public class StandUpController {
             );
 
             //todo create a timer for this task
-
+            //view.addTimerTask();
         }
+
     }
 
     public class WorkListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            //TODO
-            /*
-            if (itsPressed) => pause
-            else work
-             */
-            //System.out.println("work button este ???");
 
             if (currentlyWorking) {
                 view.makeWorkButtonsClickable();
                 // stop timer
                 //globalTimer.pauseTimer();
                 view.pauseGlobalTimer();
+                view.pauseWorkTimer(e.getSource());
             }
             else {
                 view.makeOtherButtonsUnclickable(e.getSource());
                 // start timer
                 view.resumeGlobalTimer();
+                view.resumeWorkTimer(e.getSource());
                 //globalTimer.resumeTimer();
             }
-
             currentlyWorking = !currentlyWorking;
         }
     }
 
-    public class IncrementTimeListener implements ActionListener {
+    public class GlobalTimeListener implements ActionListener {
         private Time time;
 
-        public IncrementTimeListener() {
+        public GlobalTimeListener() {
             time = new Time(0,0);
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            System.out.println("global time : " + time);
             time.incrementMinute();
             // display global time on view
             view.updateGlobalTime(time.toString());
+            //todo another listener for tasks
+        }
+    }
+
+    public class WorkTimeListener implements ActionListener, Cloneable {
+        private Time time;
+        private int index;
+
+        public WorkTimeListener (WorkTimeListener workTimeListener){
+            this.time = workTimeListener.time;
+            this.index = workTimeListener.index;
+        }
+
+        public WorkTimeListener (){
+            index = -1;
+            time = new Time(0,0);
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            time.incrementMinute();
+            view.updateWorkTime(index, time.toString());
+        }
+
+        public Time getTime() {
+            return time;
+        }
+
+        public void setIndex(int index) {
+            this.index = index;
+        }
+
+
+
+        @Override
+        public Object clone() throws CloneNotSupportedException {
+            return super.clone();
+        }
+
+        public void makeTimeZero() {
+            time = new Time(0,0);
         }
     }
 
@@ -172,6 +211,7 @@ public class StandUpController {
         @Override
         public void actionPerformed(ActionEvent e) {
             //TODO
+
         }
     }
 
