@@ -73,6 +73,22 @@ public class Goal extends AbstractGoal{
         return tasks;
     }
 
+    private void updateEstimatedTime() {
+        Time newEstimatedTime = new Time(0,0);
+        for (Task task : tasks){
+            newEstimatedTime.addTime(task.getEstimatedTime());
+        }
+        estimatedTime = newEstimatedTime;
+    }
+
+    private void updateRealiedTime() {
+        Time newRealizedTime = new Time(0,0);
+        for (Task task : tasks){
+            newRealizedTime.addTime(task.getRealizedTime());
+        }
+        realizedTime = newRealizedTime;
+    }
+
     public void updateProgress() {
         float updatedValue = computeNewProgressValue();
         progress.updateProgress(updatedValue);
@@ -93,4 +109,13 @@ public class Goal extends AbstractGoal{
                 + "\n/./ estimatedWorkTime : " + estimatedTime + " /./ realizedWorkTime : "  + realizedTime
                 + "\n/./ the list of task : \n" + tasks;
     }
+
+    public void updateGoal() {
+        updateEstimatedTime();
+        updateRealiedTime();
+        updateProgress();
+    }
+
+
+
 }

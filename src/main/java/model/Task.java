@@ -59,8 +59,8 @@ public class Task extends AbstractGoal{
     // probabil o sa trebuiasca sa fac la fel si pt realizedTime
 
     public int getProcentValue (){
-        int procentValue = (int) getProgressValue() * 100;
-        return procentValue;
+        float procentValue = getProgressValue() * 100.0f;
+        return (int) procentValue;
     }
 
     @Override
@@ -87,5 +87,13 @@ public class Task extends AbstractGoal{
             }
         }
         return fixedDescription;
+    }
+
+    public void setProgress(Progress progress) {
+        this.progress = progress;
+    }
+
+    public void setRealizedTime(Time realizedTime) {
+        this.realizedTime = realizedTime;
     }
 }

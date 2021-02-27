@@ -9,6 +9,12 @@ public class Time {
         this.minutes = minutes;
     }
 
+    public Time (String time){
+        int index = time.indexOf("|");
+        this.hours = Integer.parseInt(time.substring(0, index));
+        this.minutes = Integer.parseInt(time.substring(index+1));
+    }
+
     public void addTime(Time addedTime) {
         int totalHours      = hours     + addedTime.hours;
         int totalMinutes    = minutes   + addedTime.minutes;

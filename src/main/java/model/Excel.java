@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
 
 public class Excel {
     // ROW CONSTANTS
-    private static final int DATA_START = 2;
+    private static final int DATA_START = 2; // randu de incepere a informatiilor utile
     // COLUMN CONSTANTS (am incercat cu Enum da nu mi place duma cu .ordinal)
     private static final int TAG = 0;
     private static final int DESC = 1;
@@ -26,13 +26,13 @@ public class Excel {
     private static final int VAL = 5;
     private static final int LBL = 6;
 
-    /// CONSTATS
-    private static final String DB_LOCATION = "tasks.xlsx";
-    public static final String DATE_FORMAT = "dd/MM/yyyy";
+    /// EXCEL CONSTATS
+    private static final String DB_LOCATION = "tasks2.xlsx";
     public static final String SHEET_NAME = "StandApp";
+    public static final String DATE_FORMAT = "dd/MM/yyyy";
 
-    private static final String FINISH = "FINISH";
 
+    //// this method loads all the information from the Excel file into the app
     public static ArrayList<Goal> loadGoals () {
         // init excel reading stuff
         Workbook workbook = createWorkbook();
@@ -78,24 +78,18 @@ public class Excel {
             goals.add(currentGoal); // saveGoalWithHisTasks
         }
 
-        /*
-        try {
-            workbook.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        */
-
         System.out.println("the LOADED data is :");
         System.out.println(goals);
 
         return goals;
     }
 
+    //// this method returns the number of rows in our Excel
     private static int getNumberOfRows(Sheet sheet) {
         return sheet.getLastRowNum() + 1;
     }
 
+    //// this method tests if a row is a GOAL or a TASK
     private static boolean isGoal(Cell tag) {
         /// poate o sa o pun in parsing...
         //todo: use regex?
@@ -129,14 +123,25 @@ public class Excel {
         int minutes = Integer.parseInt(estimatedTimeString.substring(indexOfSeparator + 1));
         Time estimatedTime = new Time(hours, minutes);
 
+        ///----
+        //progress
+        String progressValueString = row.getCell(VAL).getStringCellValue();
+        indexOfSeparator = progressValueString.indexOf("%");
+        float progressValue = Float.parseFloat(progressValueString.substring(0, indexOfSeparator));
+        progressValue /= 100.0f;
+        Progress progress = new Progress(progressValue);
+        //----
+
         // make the link between ::: task <-> goal
         Task resultTask = new Task(goal, description, estimatedTime);
+        resultTask.setProgress(progress); ///// !!
         goal.addTask(resultTask); // aici goal e doar o referinta, deci ar trebui sa mearga.
 
         //System.out.println("task readed from excel : " + resultTask);
         return resultTask;
     }
 
+    //// this method returns the workbook for the Excel file
     private static Workbook createWorkbook() {
         Workbook workbook = null;
         try {
@@ -151,6 +156,7 @@ public class Excel {
         return workbook;
     }
 
+    //// after we create a GOAL on UI, we use this function to insert it in Excel
     public static void insertGoalRow(Goal newGoal) {
         Workbook workbook = createWorkbook();
         Sheet sheet = workbook.getSheet(SHEET_NAME);
@@ -197,6 +203,7 @@ public class Excel {
         writeAndCloseWorkbook(workbook);
     }
 
+    //// after we create a TASK on UI, we use this function to insert it in Excel
     public static void insertTaskRow (Task newTask) {
         Workbook workbook = createWorkbook();
         Sheet sheet = workbook.getSheet(SHEET_NAME);
@@ -252,24 +259,20 @@ public class Excel {
         writeAndCloseWorkbook(workbook);
     }
 
+    //// we use this function to delete a TASK from Excel.
+    // WE DON T DELETE GOALS, BECAUSE ONCE WE HAVE A GOAL, WE AIN'T STOP UNTIL WE SUCCED
     public static void deleteTaskRow(Task selectedTask) {
         ///todo : check duplicates [pe viitor]
         Workbook workbook = createWorkbook();
         Sheet sheet = workbook.getSheet(SHEET_NAME);
 
         int taskIndex = findTaskRowIndex(sheet, selectedTask);
-
-//        if (taskIndex != -1){
-//            sheet.shiftRows(taskIndex, taskIndex, -1);
-//        }
-        //Row row = sheet.getRow(taskIndex);
-        //sheet.removeRow(row);
-
-        sheet.shiftRows(taskIndex, sheet.getLastRowNum(), -1);
+        sheet.shiftRows(taskIndex + 1, sheet.getLastRowNum(), -1);
 
         writeAndCloseWorkbook(workbook);
     }
 
+    //// this method returns the rowIndex from Excel of a specific TASK
     private static int findTaskRowIndex(Sheet sheet, Task selectedTask) {
         int noOfRows = getNumberOfRows(sheet);
         for (int i = DATA_START; i < noOfRows; i++) {
@@ -279,7 +282,7 @@ public class Excel {
                 String searchedTaskDescription = selectedTask.getDescription().getDescription();
                 String excelTaskDescription = row.getCell(DESC).getStringCellValue();
                 if (searchedTaskDescription.equals(excelTaskDescription)){ // am gasit goalulu
-                    return i + 1; // NU STIU DC +1 DAR ASA MERGE
+                    return i;// + 1; // NU STIU DC +1 DAR ASA MERGE
                 }
             }
         }
@@ -288,7 +291,7 @@ public class Excel {
         return  -1;
     }
 
-
+    //// this method returns the rowIndex from Excel of a specific GOAL
     private static int findGoalRowIndex(Sheet sheet, Goal goalOfNewTask) {
         int noOfRows = getNumberOfRows(sheet);
         for (int i = DATA_START; i < noOfRows; i++){
@@ -307,6 +310,36 @@ public class Excel {
         return -1;
     }
 
+    //// this method is used after we pressed the save button for a TASK.
+    //// thats when we update the REALIZED TIME and PROGRESS
+    public static void updateTaskRow(Task task, String timeWork, String progressWork) {
+        Workbook workbook = createWorkbook();
+        Sheet sheet = workbook.getSheet(SHEET_NAME);
+
+        int taskIndex = findTaskRowIndex(sheet, task);
+
+        String stringRealizedTime = sheet.getRow(taskIndex).getCell(RETI).getStringCellValue();
+        Time realizedTime = new Time(stringRealizedTime);
+        Time currentRealizedTime = new Time(timeWork);
+        realizedTime.addTime(currentRealizedTime);
+        sheet.getRow(taskIndex).getCell(RETI).setCellValue(realizedTime.toString());
+        task.setRealizedTime(realizedTime);
+
+        int index = progressWork.indexOf("%");
+        int progress = Integer.valueOf(progressWork.substring(0, index));
+        System.out.println("prg : " + progress);
+        float pointProgress = progress / 100.0f;
+        task.getProgress().updateProgress(pointProgress);
+
+        sheet.getRow(taskIndex).getCell(VAL).setCellValue(progress + "%");
+        sheet.getRow(taskIndex).getCell(LBL).setCellValue(task.getProgress().getLabel());
+
+        writeAndCloseWorkbook(workbook);
+
+    }
+
+    //// after many types of operations that involve writing results in Excel
+    //// we use this function to write and close the workbook and save that results
     private static void writeAndCloseWorkbook(Workbook workbook){
         // write the results
         try{
@@ -320,32 +353,24 @@ public class Excel {
         }
     }
 
-    // finish row bullshit
-    private static boolean emptyRow (Row row){
-        if (row == null) System.out.println("wtf romania");
-        return row.getCell(TAG) == null || row.getCell(TAG).getStringCellValue().equals(FINISH);
-    }
-    private static void insertFinishRow(Sheet sheet) {
-        int lastRowIndex = sheet.getLastRowNum();
-        Row finishRow = sheet.createRow(lastRowIndex + 1);
-        Cell finishCell = finishRow.createCell(TAG);
-        finishCell.setCellValue(FINISH);
 
-    }
-    private static void deleteFinishRow(Sheet sheet) {
-        int lastRowIndex = sheet.getLastRowNum();
-        Row deletedRow = sheet.getRow(lastRowIndex);
-        sheet.removeRow(deletedRow);
-    }
-
-
-    public static void shiftRow() { // merge
+    //// when this method is called, the GOALs are updated
+    public static void updateGoalData(ArrayList<Goal> goals) {
         Workbook workbook = createWorkbook();
         Sheet sheet = workbook.getSheet(SHEET_NAME);
 
-        sheet.shiftRows(7,8,1);
+        for (Goal goal : goals){
+            int rowIndex = findGoalRowIndex(sheet, goal);
+            Excel.updateGoal(sheet, rowIndex, goal);
+        }
+
         writeAndCloseWorkbook(workbook);
     }
 
-
+    public static void updateGoal (Sheet sheet, int rowIndex, Goal goal){
+        sheet.getRow(rowIndex).getCell(ESTI).setCellValue(goal.getEstimatedTime().toString());
+        sheet.getRow(rowIndex).getCell(RETI).setCellValue(goal.getRealizedTime().toString());
+        sheet.getRow(rowIndex).getCell(VAL).setCellValue(goal.getProcent());
+        sheet.getRow(rowIndex).getCell(LBL).setCellValue(goal.getProgress().getLabel());
+    }
 }

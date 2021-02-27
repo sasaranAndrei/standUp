@@ -28,11 +28,14 @@ public class StandUpView {
 
     private InsertionTaskPanel insertionTaskPanel;
 
+    private ArrayList<JLabel> activeTasksLabels;
     private ArrayList<JButton> workButtons;
     private ArrayList<JLabel> workTimeLabels;
+    private ArrayList<JTextField> progressTextFields;
+    private ArrayList<JButton> saveButtons;
 
-    private Timer globalTimer;
     private ArrayList<Timer> workTimers;
+    private Timer globalTimer;
 
     public StandUpView() {
         // frames stuff
@@ -63,13 +66,17 @@ public class StandUpView {
         frame.validate();
 
         insertionTaskPanel = new InsertionTaskPanel();
+
+        activeTasksLabels = new ArrayList<>();
         workButtons = new ArrayList<>();
+        progressTextFields = new ArrayList<>();
         workTimers = new ArrayList<>();
         workTimeLabels = new ArrayList<>();
+        saveButtons = new ArrayList<>();
     }
 
     public void addGlobalTimerListener(GlobalTimeListener incrementTimeListener){
-        globalTimer = new Timer(1000, incrementTimeListener);
+        globalTimer = new Timer(60000, incrementTimeListener);
         //todo sa se incrementeze o data la fiecare minut
     }
 
@@ -178,7 +185,7 @@ public class StandUpView {
     public void insertWorkTimeListener(WorkTimeListener wTimeListener) {
         workTimeListener = wTimeListener;
     }
-    StandUpController.SaveListener saveListener;
+    SaveListener saveListener;
     public void insertSaveListener(SaveListener sListener) {
         saveListener = sListener;
     }
@@ -224,19 +231,64 @@ public class StandUpView {
     }
 
 
+    //todo:      !!   TASK !!
+    private String taskWorkString;
+    private String timeWorkString;
+    private String progressWorkString;
+
+    public void updateWorkInformation (Object source){
+        for (JButton saveButton : saveButtons){
+            if (saveButton == source){
+                int index = saveButtons.indexOf(saveButton);
+                taskWorkString = activeTasksLabels.get(index).getText();
+                timeWorkString = workTimeLabels.get(index).getText();
+                progressWorkString = progressTextFields.get(index).getText();
+            }
+        }
+    }
+
+    public String getTaskWorkString() {
+        return taskWorkString;
+    }
+
+    public String getTimeWorkString() {
+        return timeWorkString;
+    }
+
+    public String getProgressWorkString() {
+        return progressWorkString;
+    }
+
+
+
+
+
     private static int NO_OF_ACTIVE_TASKS = 0;
 
+    public void removeCurrentTaskLine(Object source) {
+        int index = 0;
+        for (JButton saveButton : saveButtons) {
+            if (saveButton == source) {
+                index = saveButtons.indexOf(saveButton);
+                break;
+            }
+        }
+        JPanel taskLinePanel = (JPanel) saveButtons.get(index).getParent();
+        JPanel tasksPanel = (JPanel) taskLinePanel.getParent();
+        tasksPanel.remove(taskLinePanel);
 
+        activeTasksLabels.remove(index);
+        workButtons.remove(index);
+        workTimeLabels.remove(index);
+        progressTextFields.remove(index);
+        saveButtons.remove(index);
+        workTimers.remove(index);
 
+        ViewUtils.resizeWindowMinus(frame);
 
-
-
-
-    /*
-
-
-         */
-
+        frame.repaint();
+        frame.validate();
+    }
 
     // JPanel for the main (header part of the app)
     private class MainPanel extends JPanel {
@@ -268,7 +320,7 @@ public class StandUpView {
             globalTimeLabel.setForeground(ViewUtils.LABEL_COLOR);
             this.add(globalTimeLabel);
 
-            globalTimeValueLabel = new JLabel("00:00");
+            globalTimeValueLabel = new JLabel("0|0");
             globalTimeValueLabel.setFont(new Font("Bodoni MT Black", Font.BOLD, ViewUtils.COMPONENT_TEXT_SIZE));
             globalTimeValueLabel.setForeground(ViewUtils.LABEL_COLOR);
             this.add(globalTimeValueLabel);
@@ -357,10 +409,6 @@ public class StandUpView {
             this.add(taskRowsPanel, BorderLayout.CENTER);
             validate();
         }
-
-
-
-
     }
 
     private class TaskLinePanel extends JPanel {
@@ -382,6 +430,7 @@ public class StandUpView {
             taskDescriptionLabel.setFont(new Font("Bodoni MT Black", Font.BOLD, ViewUtils.COMPONENT_TEXT_SIZE));
             taskDescriptionLabel.setForeground(ViewUtils.LABEL_COLOR);
             this.add(taskDescriptionLabel);
+            activeTasksLabels.add(taskDescriptionLabel);
 
             taskWorkButton = new JButton("WORK");
             taskWorkButton.setFont(new Font("Bodoni MT Black", Font.BOLD, ViewUtils.COMPONENT_TEXT_SIZE));
@@ -408,6 +457,7 @@ public class StandUpView {
             taskProgress = new JTextField(3);
             taskProgress.setText(selectedTaskProgressValue + "%");
             this.add(taskProgress);
+            progressTextFields.add(taskProgress);
 
             ImageIcon saveIcon = new ImageIcon("resources/saveIcon.png");
             Image image = saveIcon.getImage();
@@ -420,7 +470,7 @@ public class StandUpView {
             saveProgressButton.setBackground(ViewUtils.BUTTON_BACKGROUND_COLOR);
             saveProgressButton.addActionListener(saveListener);
             this.add(saveProgressButton);
-
+            saveButtons.add(saveProgressButton);
         }
 
         public void addTimerActionListener() {
@@ -430,7 +480,7 @@ public class StandUpView {
                     WorkTimeListener newWorkTimeListener = (WorkTimeListener) workTimeListener.clone(); // copy
                     newWorkTimeListener.setIndex(NO_OF_ACTIVE_TASKS);
                     newWorkTimeListener.makeTimeZero();
-                    Timer timer = new Timer(1000, newWorkTimeListener);
+                    Timer timer = new Timer(60000, newWorkTimeListener);
                     workTimers.add(timer);
                     NO_OF_ACTIVE_TASKS++;
                 }

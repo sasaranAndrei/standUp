@@ -14,8 +14,8 @@ public abstract class AbstractGoal {
         return getProgress().getLevel() == Progress.LAST_LEVEL;
     }
     public String getProcent () {
-        int procent = (int) getProgress().getValue() * 100;
-        String result = procent + "%";
+        float procent = getProgress().getValue() * 100.0f;
+        String result = (int) procent + "%";
         return result;
     }
     public String getShortDescription (){

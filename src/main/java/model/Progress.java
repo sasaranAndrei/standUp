@@ -31,6 +31,11 @@ public class Progress {
         updateProgress(value);
     }
 
+    public Progress(float value){
+        this.value = value;
+        updateProgress(this.value);
+    }
+
     // C preia din V procentul PROC, iar newValue = PROC / 100
     public void updateProgress(float newValue){
         if (newValue < value) {

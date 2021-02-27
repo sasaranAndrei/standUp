@@ -135,7 +135,6 @@ public class StandUpController {
             if (currentlyWorking) {
                 view.makeWorkButtonsClickable();
                 // stop timer
-                //globalTimer.pauseTimer();
                 view.pauseGlobalTimer();
                 view.pauseWorkTimer(e.getSource());
             }
@@ -144,7 +143,6 @@ public class StandUpController {
                 // start timer
                 view.resumeGlobalTimer();
                 view.resumeWorkTimer(e.getSource());
-                //globalTimer.resumeTimer();
             }
             currentlyWorking = !currentlyWorking;
         }
@@ -207,11 +205,23 @@ public class StandUpController {
     }
 
     public class SaveListener implements ActionListener {
-
         @Override
         public void actionPerformed(ActionEvent e) {
+            model.loadData(); // ca nu cumva sa stearga omu meu tasku si io sa lucru la el
             //TODO
+            // verifica ce buton s o apasat ca sa salvezi progresu si time u in excel
+            //System.out.println(">?>");
+            view.updateWorkInformation(e.getSource());
+            String taskWork = view.getTaskWorkString();
+            String timeWork = view.getTimeWorkString();
+            String progressWork = view.getProgressWorkString();
+            Task task = model.findTaskByDescription(taskWork);
+            System.out.println(task);
+            Excel.updateTaskRow(task, timeWork, progressWork);
 
+            view.removeCurrentTaskLine(e.getSource());
+            model.updateGoalData();
+            Excel.updateGoalData(model.getGoals());
         }
     }
 
@@ -220,7 +230,7 @@ public class StandUpController {
     public class AddGoalListener implements ActionListener {
 
         @Override
-        public void actionPerformed(ActionEvent e) { // it kinda works!
+        public void actionPerformed(ActionEvent e) {
             System.out.println("Add the goal");
             //MOMENTAN PREUSPUNEM CA DATELES VALIDE
             //todo format like : "dd/MM/yyyy"
