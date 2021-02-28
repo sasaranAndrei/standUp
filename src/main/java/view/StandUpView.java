@@ -1,7 +1,6 @@
 package view;
 
 //todo add manually all the listeners from controller
-import controller.StandUpController;
 import controller.StandUpController.ManageGoalListener;
 import controller.StandUpController.AddTaskListener;
 import controller.StandUpController.AddTaskToActiveTasks;
@@ -13,6 +12,7 @@ import controller.StandUpController.SaveListener;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.ArrayList;
@@ -25,18 +25,20 @@ public class StandUpView {
     private JFrame frame;
     private MainPanel mainPanel;
     private TasksPanel tasksPanel;
-
     private InsertionTaskPanel insertionTaskPanel;
 
+    // arraylists of components that will be updated
     private ArrayList<JLabel> activeTasksLabels;
     private ArrayList<JButton> workButtons;
     private ArrayList<JLabel> workTimeLabels;
     private ArrayList<JTextField> progressTextFields;
     private ArrayList<JButton> saveButtons;
 
+    // TIMERS
     private ArrayList<Timer> workTimers;
     private Timer globalTimer;
 
+    /// initialize the GUI & create the components that will be updated
     public StandUpView() {
         // frames stuff
         frame = new JFrame();
@@ -75,16 +77,38 @@ public class StandUpView {
         saveButtons = new ArrayList<>();
     }
 
+    /*
+        ACTION LISTENERS
+    1)
+    if a method is called : addXListener(X) =>
+        a specific component will get that X. ex: parentComponent.component.set(X)
+
+    2)
+    if a method is called : insertYListener(Y) =>
+        a local variable will store that value Y
+        and when the specific component is created, that component will get that localY.
+        ex:
+        localY = Y
+        creatingComponent(){
+            component = new()
+            parentComponent.component.sete(localY)
+        }
+
+    1) XListener is used for STATIC components (that will be always there)
+    2) YListener is used for DYNAMIC components (that might appear or don't)
+     */
+
+    //// for creating GLOBAL TIMER
     public void addGlobalTimerListener(GlobalTimeListener incrementTimeListener){
-        globalTimer = new Timer(60000, incrementTimeListener);
-        //todo sa se incrementeze o data la fiecare minut
+        globalTimer = new Timer(ViewUtils.TIME_PERIOD, incrementTimeListener);
     }
 
+    //// for opening MANAGE GOALS FRAME
     public void addManageGoalsListener(ManageGoalListener manageGoalListener) {
-        // Manage Goals BUTTON
         mainPanel.manageGoalsButton.addActionListener(manageGoalListener);
     }
 
+    //// for selecting a TASK in order to add it to the mainFrame
     public void addTaskListener(AddTaskListener addTaskListener){
         tasksPanel.addTaskButton.addActionListener(addTaskListener);
     }
@@ -176,24 +200,25 @@ public class StandUpView {
         }
     }
 
-    WorkListener workGlobalListener;
-    public void insertWorkListener(WorkListener workListener) {
-        workGlobalListener = workListener;
+    // workListner - for the logic of start / stop working -> timers, labels, ...
+    WorkListener workListener;
+    public void insertWorkListener(WorkListener wListener) {
+        workListener = wListener;
     }
-    //ArrayList<WorkTimeListener> workTimeListeners = new ArrayList<>();
+
+    // workTimeListener - listener for a TASK
     WorkTimeListener workTimeListener;
     public void insertWorkTimeListener(WorkTimeListener wTimeListener) {
         workTimeListener = wTimeListener;
     }
+
     SaveListener saveListener;
     public void insertSaveListener(SaveListener sListener) {
         saveListener = sListener;
     }
 
-
-
-
-
+    /// TIME AND TIMERS
+    // GLOBAL timer
     public void updateGlobalTime(String timeString) {
         mainPanel.globalTimeValueLabel.setText(timeString);
     }
@@ -206,6 +231,7 @@ public class StandUpView {
         globalTimer.stop();
     }
 
+    // WORK timer
     public void resumeWorkTimer (Object source){
         //TODO: verifica al catelea buton s o apasat ca sa stii ce label sa modifici
         for (JButton workButton : workButtons){
@@ -229,6 +255,8 @@ public class StandUpView {
     public void updateWorkTime(int index, String timeString) {
         workTimeLabels.get(index).setText(timeString);
     }
+
+
 
 
     //todo:      !!   TASK !!
@@ -263,8 +291,12 @@ public class StandUpView {
 
 
 
+
+
+    /// number of active tasks displayed on the mainFrame
     private static int NO_OF_ACTIVE_TASKS = 0;
 
+    /// with this method we remove the current taskline after we save the progress
     public void removeCurrentTaskLine(Object source) {
         int index = 0;
         for (JButton saveButton : saveButtons) {
@@ -282,12 +314,49 @@ public class StandUpView {
         workTimeLabels.remove(index);
         progressTextFields.remove(index);
         saveButtons.remove(index);
+        resetActionListenersIndex(index);
         workTimers.remove(index);
+        NO_OF_ACTIVE_TASKS--;
 
         ViewUtils.resizeWindowMinus(frame);
 
         frame.repaint();
         frame.validate();
+    }
+
+    /// when a taskline is removed from the tasksPanel, the indexes of the others
+    /// action listeners get scrambled, so we have to reset them
+    public void resetActionListenersIndex (int index){
+        for (int i = index + 1; i < workTimers.size(); i++){
+            ActionListener workTimeListener = workTimers.get(i).getActionListeners()[0];
+            if (workTimeListener instanceof WorkTimeListener){
+                ((WorkTimeListener) workTimeListener).setIndex(i-1);
+            }
+        }
+    }
+
+    /// when a WORK_TIME_PERIOD goes, we have to print a message, so the user will standUp
+    public void showStandUpMessage() {
+        java.awt.Toolkit.getDefaultToolkit().beep(); // make an audio advertise
+        JOptionPane.showMessageDialog(null,"Stand Up! Take a break. Change your position.");
+    }
+
+    /// when the user is CURRENTLY_WORKING, the global time is highlight
+    public void highlightGlobalTime() {
+        mainPanel.globalTimeValueLabel.setForeground(ViewUtils.HIGHLIGHT_LABEL_COLOR);
+    }
+
+    /// when the user pause working, we have to UNhighlight the global time
+    public void unHighlightGlobalTime() {
+        mainPanel.globalTimeValueLabel.setForeground(ViewUtils.LABEL_COLOR);
+    }
+
+    /// also, when the user is pause working, we stop all the counters
+    public void stopAllCounters() {
+        globalTimer.stop();
+        for (Timer timer : workTimers){
+            timer.stop();
+        }
     }
 
     // JPanel for the main (header part of the app)
@@ -329,6 +398,7 @@ public class StandUpView {
         }
     }
 
+    // JPanel for the tasksPanel, where we ADD ACTIVE TASKS, WORK ON THEM and SAVE THEM
     private class TasksPanel extends JPanel{
         // view
         private JPanel descriptionPanel; // the first row (indicators)
@@ -411,6 +481,7 @@ public class StandUpView {
         }
     }
 
+    // a JPanel with TaskLabel, WorkButton, TimeLabel, ProgressLabel and SaveButton for each task
     private class TaskLinePanel extends JPanel {
         // view
         private JLabel taskDescriptionLabel;
@@ -440,7 +511,7 @@ public class StandUpView {
             taskWorkButton.setPreferredSize(ViewUtils.WORK_BUTTON_SIZE);
             //////////// MOUSE LISTENER ???
             addTimerActionListener();
-            taskWorkButton.addActionListener(workGlobalListener);
+            taskWorkButton.addActionListener(workListener);
             this.add(taskWorkButton);
             // make the link
             workButtons.add(taskWorkButton);
@@ -480,7 +551,7 @@ public class StandUpView {
                     WorkTimeListener newWorkTimeListener = (WorkTimeListener) workTimeListener.clone(); // copy
                     newWorkTimeListener.setIndex(NO_OF_ACTIVE_TASKS);
                     newWorkTimeListener.makeTimeZero();
-                    Timer timer = new Timer(60000, newWorkTimeListener);
+                    Timer timer = new Timer(ViewUtils.TIME_PERIOD, newWorkTimeListener); // 60.000
                     workTimers.add(timer);
                     NO_OF_ACTIVE_TASKS++;
                 }
@@ -491,8 +562,7 @@ public class StandUpView {
         }
     }
 
-
-
+    // a JPanel for ADDING A NEW ACTIVE TASK to the mainFrame
     private class InsertionTaskPanel extends JPanel {
         //todo 2 comboBoxuri si un buton de validare
         // care odata apasat dispare InsertionTaskPanelu
@@ -532,41 +602,32 @@ public class StandUpView {
         }
     }
 
-
-    // WindowsListener for saving the data before closing app.
+    // WindowsListener for comuting thru mainFrame and manageGoalsFrame
     class MyWindowListener implements WindowListener {
 
         @Override
         public void windowOpened(WindowEvent e) {
-
         }
 
         @Override
         public void windowClosing(WindowEvent e) {
-            //TODO SAVE THE WORK BEFORE CLOSING APP
-            System.out.println("X button => QUIT");
-            System.out.println("save the work PLS");
-            frame.dispose();
+           frame.dispose();
         }
 
         @Override
         public void windowClosed(WindowEvent e) {
-
         }
 
         @Override
         public void windowIconified(WindowEvent e) {
-
         }
 
         @Override
         public void windowDeiconified(WindowEvent e) {
-
         }
 
         @Override
         public void windowActivated(WindowEvent e) {
-
         }
 
         @Override
@@ -575,6 +636,7 @@ public class StandUpView {
         }
     }
 
+    /// getters for the 2 frames
     public JFrame getFrame() {
         return frame;
     }
@@ -582,7 +644,6 @@ public class StandUpView {
     public JFrame getChildFrame() {
         return manageGoalsFrame.getFrame();
     }
-
 
 }
 

@@ -6,6 +6,11 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
 public class ViewUtils {
+    public static final int SECOND = 1000; // this one is for the test
+    public static final int MINUTE = 60000; // this is the right one
+    public static final int TIME_PERIOD = MINUTE;
+
+
     //static final Dimension DISPLAY_PANEL_DIMENSION = new Dimension(400,400);
     static Dimension GOAL_MANAGER_FRAME_DIMENSION = new Dimension(400,150); // CAN BE MODIFIED -> not FINAL // height = 150 up to 200
     static Dimension BIGGER_GOAL_MANAGER_FRAME_DIMENSION = new Dimension(400,220); // CAN BE MODIFIED -> not FINAL // height = 150 up to 200
@@ -26,6 +31,8 @@ public class ViewUtils {
     static final Color BUTTON_COLOR = Color.decode("#003D59");
     static final Color BUTTON_BACKGROUND_COLOR = Color.decode("#cd9100");
     static final Color LABEL_COLOR = Color.decode("#001c2f");
+    static final Color HIGHLIGHT_LABEL_COLOR = Color.decode("#FF0000");
+
     /// frame & panels constants
     static final Dimension MAIN_PANEL_DIMENSION = new Dimension(400, 40);
     static final Dimension TASK_PANEL_DIMENSION = new Dimension(400, 40);

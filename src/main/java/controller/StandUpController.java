@@ -15,7 +15,6 @@ public class StandUpController {
     private StandUpView  view;
 
     private boolean currentlyWorking;
-    //private TimerTask globalTimer;
 
     public StandUpController(StandUpModel theModel, StandUpView theView) {
         model = theModel;
@@ -44,7 +43,6 @@ public class StandUpController {
         view.manageGoalsFrame.addRemoveTaskListener(new RemoveTaskListener());
 
         // timers
-        //globalTimer = new TimerTask("global");
         currentlyWorking = false;
     }
 
@@ -128,17 +126,17 @@ public class StandUpController {
     }
 
     public class WorkListener implements ActionListener {
-
         @Override
         public void actionPerformed(ActionEvent e) {
-
-            if (currentlyWorking) {
+            if (currentlyWorking) { // pauza de la lucru
+                view.unHighlightGlobalTime();
                 view.makeWorkButtonsClickable();
                 // stop timer
                 view.pauseGlobalTimer();
                 view.pauseWorkTimer(e.getSource());
             }
-            else {
+            else { // ma pun sa lucrez
+                view.highlightGlobalTime();
                 view.makeOtherButtonsUnclickable(e.getSource());
                 // start timer
                 view.resumeGlobalTimer();
@@ -160,18 +158,17 @@ public class StandUpController {
             time.incrementMinute();
             // display global time on view
             view.updateGlobalTime(time.toString());
-            //todo another listener for tasks
+
+            if (time.haveToStandUp()){
+                view.stopAllCounters();
+                view.showStandUpMessage();
+            }
         }
     }
 
     public class WorkTimeListener implements ActionListener, Cloneable {
         private Time time;
         private int index;
-
-        public WorkTimeListener (WorkTimeListener workTimeListener){
-            this.time = workTimeListener.time;
-            this.index = workTimeListener.index;
-        }
 
         public WorkTimeListener (){
             index = -1;
@@ -184,15 +181,9 @@ public class StandUpController {
             view.updateWorkTime(index, time.toString());
         }
 
-        public Time getTime() {
-            return time;
-        }
-
         public void setIndex(int index) {
             this.index = index;
         }
-
-
 
         @Override
         public Object clone() throws CloneNotSupportedException {

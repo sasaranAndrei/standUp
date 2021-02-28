@@ -1,6 +1,8 @@
 package model;
 
 public class Time {
+    private static final int WORK_TIME_PERIOD = 30; // o data la X minute tre sa ridici
+
     private int hours;
     private int minutes;
 
@@ -42,5 +44,9 @@ public class Time {
             minutes = 0;
         }
         else minutes++;
+    }
+
+    public boolean haveToStandUp() {
+        return minutes % WORK_TIME_PERIOD == 0;
     }
 }
